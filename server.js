@@ -13,13 +13,13 @@ const rooms = new Map();
 const MAX_PLAYERS = 10;
 const MATCH_TARGET = 30;
 const MAPS = new Set(['Harbor', 'Desert', 'Factory']);
-const GUNS = {
-  Ranger: { interval: 190, damage: 34, range: 65 },
-  Viper: { interval: 115, damage: 18, range: 55 },
-  Bulldog: { interval: 330, damage: 65, range: 29 }
+const TAG_TOOLS = {
+  Pulse: { interval: 190, tagPower: 34, range: 65 },
+  Arc: { interval: 115, tagPower: 18, range: 55 },
+  Nova: { interval: 330, tagPower: 65, range: 29 }
 };
 
-app.get('/health', (_req, res) => res.json({ ok: true, game: 'Shadow Ops FPS', rooms: rooms.size }));
+app.get('/health', (_req, res) => res.json({ ok: true, game: 'Shadow Ops Energy Tag', rooms: rooms.size }));
 app.get('/api/status', (_req, res) => res.json({ ok: true, rooms: rooms.size, players: [...rooms.values()].reduce((n, r) => n + r.players.size, 0) }));
 
 function makeCode() {
@@ -47,7 +47,7 @@ function spawnFor(team, index) {
   return { x: team === 'blue' ? -20 + (index % 2) * 2 : 20 - (index % 2) * 2, y: 1.7, z: ((index % 5) - 2) * 3.4 };
 }
 function publicPlayer(p) {
-  return { id: p.id, name: p.name, team: p.team, x: p.x, y: p.y, z: p.z, yaw: p.yaw, pitch: p.pitch, hp: p.hp, kills: p.kills, deaths: p.deaths, alive: p.alive, ready: p.ready, gun: p.gun, skin: p.skin };
+  return { id: p.id, name: p.name, team: p.team, x: p.x, y: p.y, z: p.z, yaw: p.yaw, pitch: p.pitch, hp: p.hp, kills: p.kills, deaths: p.deaths, alive: p.alive, ready: p.ready, tool: p.tool, skin: p.skin };
 }
 function snapshot(room) {
   return { code: room.code, privateRoom: room.privateRoom, map: room.map, status: room.status, hostId: room.hostId, players: [...room.players.values()].map(publicPlayer), score: room.score, target: MATCH_TARGET, maxPlayers: MAX_PLAYERS, feed: room.feed.slice(-6) };
@@ -80,7 +80,7 @@ function join(socket, room, rawName) {
   const index = [...room.players.values()].filter(p => p.team === team).length;
   const spawn = spawnFor(team, index);
   const name = cleanName(rawName);
-  const player = { id: socket.id, name, team, ...spawn, yaw: team === 'blue' ? -Math.PI / 2 : Math.PI / 2, pitch: 0, hp: 100, kills: 0, deaths: 0, alive: true, ready: false, gun: 'Ranger', skin: 'default', lastShot: 0, lastMove: Date.now() };
+  const player = { id: socket.id, name, team, ...spawn, yaw: team === 'blue' ? -Math.PI / 2 : Math.PI / 2, pitch: 0, hp: 100, kills: 0, deaths: 0, alive: true, ready: false, tool: 'Pulse', skin: 'default', lastPulse: 0, lastMove: Date.now() };
   room.players.set(socket.id, player);
   if (!room.hostId) room.hostId = socket.id;
   socket.data.roomCode = room.code;
@@ -126,7 +126,7 @@ io.on('connection', socket => {
   socket.on('selectLoadout', data => {
     const room = currentRoom(socket), p = room && room.players.get(socket.id);
     if (!p || !data) return;
-    if (GUNS[data.gun]) p.gun = data.gun;
+    if (TAG_TOOLS[data.tool]) p.tool = data.tool;
     if (typeof data.skin === 'string' && /^[a-z0-9_-]{1,24}$/i.test(data.skin)) p.skin = data.skin;
     broadcast(room);
   });
@@ -140,7 +140,7 @@ io.on('connection', socket => {
       const ix = [...room.players.values()].filter(q => q.team === p.team).findIndex(q => q.id === p.id);
       Object.assign(p, spawnFor(p.team, ix));
     }
-    say(room, 'MATCH STARTED — first team to 30 eliminations wins!');
+    say(room, 'MATCH STARTED — first team to 30 tagOuts wins!');
     io.to(room.code).emit('matchStarted', snapshot(room));
     broadcast(room);
   });
@@ -166,12 +166,12 @@ io.on('connection', socket => {
     p.y = Number(data.y) > 2.2 ? 2.8 : 1.7;
     p.yaw = yaw; p.pitch = Math.max(-1.25, Math.min(1.25, pitch)); p.lastMove = Date.now();
   });
-  socket.on('shoot', data => {
+  socket.on('tagPulse', data => {
     const room = currentRoom(socket), shooter = room && room.players.get(socket.id);
     if (!room || room.status !== 'playing' || !shooter || !shooter.alive || !data || !data.dir) return;
-    const cfg = GUNS[shooter.gun] || GUNS.Ranger, now = Date.now();
-    if (now - shooter.lastShot < cfg.interval) return;
-    shooter.lastShot = now;
+    const cfg = TAG_TOOLS[shooter.tool] || TAG_TOOLS.Pulse, now = Date.now();
+    if (now - shooter.lastPulse < cfg.interval) return;
+    shooter.lastPulse = now;
     const ray = { x: Number(data.dir.x), y: Number(data.dir.y), z: Number(data.dir.z) };
     if (![ray.x,ray.y,ray.z].every(Number.isFinite)) return;
     const len = Math.hypot(ray.x,ray.y,ray.z) || 1; ray.x/=len; ray.y/=len; ray.z/=len;
@@ -184,15 +184,15 @@ io.on('connection', socket => {
       const miss = Math.hypot(vx-ray.x*along, vy-ray.y*along, vz-ray.z*along);
       if (miss < 1.35 && along < best) { target = t; best = along; }
     }
-    io.to(room.code).emit('shotFx', { id: shooter.id, x: shooter.x, y: shooter.y, z: shooter.z, dir: ray, hitId: target && target.id, at: now });
+    io.to(room.code).emit('pulseFx', { id: shooter.id, x: shooter.x, y: shooter.y, z: shooter.z, dir: ray, hitId: target && target.id, at: now });
     if (!target) return;
-    target.hp -= cfg.damage;
-    io.to(room.code).emit('hitFx', { shooterId: shooter.id, targetId: target.id, hp: Math.max(0, target.hp) });
+    target.hp -= cfg.tagPower;
+    io.to(room.code).emit('tagHit', { shooterId: shooter.id, targetId: target.id, hp: Math.max(0, target.hp) });
     if (target.hp <= 0) {
       target.alive = false; target.deaths++; shooter.kills++; room.score[shooter.team]++;
-      say(room, shooter.name + ' eliminated ' + target.name);
+      say(room, shooter.name + ' tagged out ' + target.name);
       broadcast(room);
-      io.to(room.code).emit('elimination', { shooterId: shooter.id, targetId: target.id, score: room.score });
+      io.to(room.code).emit('tagOut', { shooterId: shooter.id, targetId: target.id, score: room.score });
       if (room.score[shooter.team] >= MATCH_TARGET) {
         room.status = 'ended';
         io.to(room.code).emit('matchEnded', { winner: shooter.team, score: room.score });
