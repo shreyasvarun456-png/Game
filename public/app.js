@@ -22,7 +22,7 @@ socket.on('notice',n=>toast(n.text));
 socket.on('joinedRoom',d=>{state.selfId=d.selfId;state.room=d.room;state.ready=false;localStorage.setItem('shadowName',state.name);renderRoom();showView('lobby');closeModal();updateUrl();});
 socket.on('roomState',r=>{if(!state.room||state.room.code===r.code){state.room=r;renderRoom();syncPlayers(r);if(r.status==='lobby'&&state.view==='game')showView('lobby');}});
 socket.on('feed',f=>{if(state.view==='game')addFeed(f.text);});
-socket.on('matchStarted',r=>{state.room=r;localPlayer();renderRoom();launchGame();});
+socket.on('matchStarted',r=>{state.room=r;localPlayer();renderRoom();});
 socket.on('returnedToLobby',r=>{state.room=r;gameActive=false;showView('lobby');renderRoom();});
 socket.on('matchEnded',d=>{gameActive=false;$('game-message-title').textContent=d.winner===myTeam()?'VICTORY':'MATCH OVER';$('game-message-text').textContent='ALPHA '+d.score.blue+' — BRAVO '+d.score.red+'. Return to the lobby to run it back.';$('game-message').classList.remove('hidden');});
 socket.on('tagHit',d=>{if(d.targetId===state.selfId){$('hp-value').textContent=d.hp;$('hp-bar').style.width=d.hp+'%';}});
