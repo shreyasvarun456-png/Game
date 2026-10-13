@@ -53,6 +53,9 @@ html,body{background:#070b10}
 @media(hover:none),(pointer:coarse){#game-canvas,#game-stage,.touch-look,.game-buttons,.game-buttons *{touch-action:none}}
 
 
+}
+}
+
 /* SHADOW OPS visual + mobile-control pass */
 .hero-scene{background:linear-gradient(90deg,#0b141b 0%,#0b141b12 42%,#08101722 100%),linear-gradient(180deg,#33474d 0%,#17272e 48%,#080d12 100%);isolation:isolate}
 .hero-scene:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 67% 26%,#b6d5dc18 0,transparent 30%),linear-gradient(115deg,transparent 0 36%,#d2e8e711 37%,transparent 38% 60%,#0004 61%),repeating-linear-gradient(0deg,transparent 0 42px,#a7c3c50a 43px 44px);mix-blend-mode:screen;pointer-events:none}
