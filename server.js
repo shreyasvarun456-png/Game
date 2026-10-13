@@ -44,8 +44,7 @@ const MAPS = new Set(['Harbor', 'Desert', 'Factory', 'Docks']);
 const TAG_TOOLS = {
   Pulse: { interval: 190, tagPower: 34, range: 65 },
   Arc: { interval: 115, tagPower: 18, range: 55 },
-  Nova: { interval: 330, tagPower: 65, range: 29 },
-  Sniper: { interval: 650, tagPower: 100, range: 100 }
+  Nova: { interval: 330, tagPower: 65, range: 29 }
 };
 
 app.get('/health', (_req, res) => res.json({ ok: true, game: 'Shadow Ops Energy Tag', rooms: rooms.size }));
