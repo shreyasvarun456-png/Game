@@ -77,7 +77,7 @@ if(map==='Harbor'){
 }else if(map==='Docks'){
   const dockMat=new THREE.MeshStandardMaterial({color:0x876c4e,roughness:.9});
   const waterMat=new THREE.MeshStandardMaterial({color:0x245d76,roughness:.35,metalness:.12});
-  const water=new THREE.Mesh(new THREE.PlaneGeometry(100,100),waterMat);water.rotation.x=-Math.PI/2;water.position.set(0,-.08,0);scene.add(water);
+  const water=new THREE.Mesh(new THREE.PlaneGeometry(100,100),waterMat);water.rotation.x=-Math.PI/2;water.position.set(0,-.035,0);scene.add(water);
   for(const x of [-30,-18,18,30]){box(x,.2,-8,7,.4,38,dockMat);for(let z=-24;z<=10;z+=5)box(x,.43,z,6.9,.07,.12,trimMat);}
   for(const x of [-25,25]){box(x,2,-15,7,4,7,crateMat);box(x,2,12,7,4,7,crateMat);}
   for(let z of [-30,28]){box(0,1.3,z,22,2.6,1,wallMat);for(let x=-10;x<=10;x+=4)box(x,1.4,z-.65,.15,2.3,.15,trimMat);}
@@ -88,7 +88,7 @@ if(map==='Harbor'){
 for(let x=-36;x<=36;x+=12){box(x,.015,0,.045,.025,70,stripeMat);box(0,.016,x,70,.025,.045,stripeMat);}
 
 const gunMetal=new THREE.MeshStandardMaterial({color:0x242b2d,metalness:.78,roughness:.3});
-const weaponFinish=localStorage.getItem('shadowWeaponSkin')||'standard';const gunPolymer=new THREE.MeshStandardMaterial({color:weaponFinish==='cyan'?0x18cbd0:weaponFinish==='gold'?0xc99b36:0x151b1d,metalness:weaponFinish==='gold' ? 0.72 : 0.15,roughness:weaponFinish==='gold' ? 0.3 : 0.58});
+const weaponFinish=localStorage.getItem('shadowWeaponSkin')||'standard';const gunPolymer=new THREE.MeshStandardMaterial({color:weaponFinish==='cyan'?0x18cbd0:weaponFinish==='gold'?0xc99b36:weaponFinish==='2g'?0x8bf6ff:0x151b1d,metalness:weaponFinish==='gold' ? 0.72 : 0.15,roughness:weaponFinish==='gold' ? 0.3 : 0.58});
 const gunEdge=new THREE.MeshStandardMaterial({color:0x465257,metalness:.7,roughness:.32});
 const glassMat=new THREE.MeshStandardMaterial({color:0x152c30,metalness:.25,roughness:.14,transparent:true,opacity:.9,emissive:0x082326});
 const gloveMat=new THREE.MeshStandardMaterial({color:0x202624,roughness:.92});
