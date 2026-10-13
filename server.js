@@ -146,7 +146,7 @@ io.on('connection', socket => {
   });
   socket.on('returnToLobby', () => {
     const room = currentRoom(socket);
-    if (!room || room.status !== 'playing') return;
+    if (!room || !['playing', 'ended'].includes(room.status)) return;
     room.status = 'lobby'; room.score = { blue: 0, red: 0 };
     for (const p of room.players.values()) { p.ready = false; p.alive = true; p.hp = 100; }
     say(room, 'The squad returned to the lobby');
