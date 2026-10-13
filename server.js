@@ -140,7 +140,7 @@ io.on('connection', socket => {
       const ix = [...room.players.values()].filter(q => q.team === p.team).findIndex(q => q.id === p.id);
       Object.assign(p, spawnFor(p.team, ix));
     }
-    say(room, 'MATCH STARTED — first team to 30 tagOuts wins!');
+    say(room, 'MATCH STARTED — first team to 30 eliminations wins!');
     io.to(room.code).emit('matchStarted', snapshot(room));
     broadcast(room);
   });
@@ -190,7 +190,7 @@ io.on('connection', socket => {
     io.to(room.code).emit('tagHit', { shooterId: shooter.id, targetId: target.id, hp: Math.max(0, target.hp) });
     if (target.hp <= 0) {
       target.alive = false; target.deaths++; shooter.kills++; room.score[shooter.team]++;
-      say(room, shooter.name + ' tagged out ' + target.name);
+      say(room, shooter.name + ' eliminated ' + target.name);
       broadcast(room);
       io.to(room.code).emit('tagOut', { shooterId: shooter.id, targetId: target.id, score: room.score });
       if (room.score[shooter.team] >= MATCH_TARGET) {
