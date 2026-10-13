@@ -1,12 +1,17 @@
-name: Shadow Ops CI and deploy
+name: Shadow Ops CI and publish
 on:
   push:
     branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
 jobs:
-  test-and-publish:
+  test-backend:
     runs-on: ubuntu-latest
     steps:
       - name: Check out source
@@ -19,7 +24,7 @@ jobs:
         run: npm install
       - name: Check JavaScript syntax
         run: npm run check
-      - name: Smoke test HTTP and Socket.IO
+      - name: Smoke test backend and Socket.IO
         run: |
           npm start > /tmp/shadow-ops.log 2>&1 &
           PID=$!
@@ -31,8 +36,22 @@ jobs:
           cat /tmp/health.json
           node -e "const fs=require('fs');const x=JSON.parse(fs.readFileSync('/tmp/health.json'));if(!x.ok)process.exit(1)"
           curl -fsS http://127.0.0.1:3000/socket.io/socket.io.js >/dev/null
-      - name: Trigger Render deployment when configured
-        env:
-          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
-        if: ${{ env.RENDER_DEPLOY_HOOK != '' }}
-        run: curl --fail --silent --show-error --request POST "$RENDER_DEPLOY_HOOK"
+          curl -fsS http://127.0.0.1:3000/ | grep -q "TEAM ENERGY TAG"
+  deploy-pages:
+    needs: test-backend
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload browser client
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - name: Publish site
+        id: deployment
+        uses: actions/deploy-pages@v4
