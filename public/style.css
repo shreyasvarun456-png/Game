@@ -170,3 +170,6 @@ html,body{background:#070b10}
 #fire-button{position:relative}
 #fire-button:after{content:"";position:absolute;inset:-7px;border:1px solid #ffb08c55;border-radius:50%;pointer-events:none}
 @media(pointer:coarse){.action-controls{gap:10px}.reload-button{width:60px;min-width:60px;height:36px;font-size:8px}.game-bottom .tool-hud{min-width:90px}.tool-hud b{font-size:21px}}
+
+/* Aim toggle state */
+#aim-toggle[aria-pressed="true"]{border-color:var(--lime);color:var(--lime);box-shadow:0 0 0 1px #c8fa6933 inset}
