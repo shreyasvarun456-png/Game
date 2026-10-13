@@ -4,6 +4,34 @@ const crypto = require('crypto');
 const path = require('path');
 const { Server } = require('socket.io');
 
+
+function worldSolids(map) {
+  const a=[];
+  const add=(x,y,z,w,h,d)=>a.push({minX:x-w/2,maxX:x+w/2,minY:0,maxY:h,minZ:z-d/2,maxZ:z+d/2});
+  add(0,4,-43,90,4,2);add(0,4,43,90,4,2);add(-43,4,0,2,4,90);add(43,4,0,2,4,90);
+  for(let i=-2;i<=2;i++){const z=i*12;add(-10,2.8,z,8,2.8,4);add(10,2.8,z+4,8,2.8,4);add(i*8,2.2,z+6,3.2,2.2,3.2);add(i*7,4.8,z-8,8,4.8,3.8);}
+  for(let i=0;i<14;i++){const x=(i%7-3)*11,z=(Math.floor(i/7)?1:-1)*31;add(x,2.2,z,5,2.2,2.5);}
+  for(const side of [-1,1])for(let j=0;j<4;j++){const x=side*(20+j*3.5),z=(j%2?-1:1)*23;add(x,3.8,z,3.2,3.8,6);}
+  if(map==='Desert'){for(let i=0;i<10;i++){const x=(i%5-2)*13,z=(i<5?-1:1)*29;add(x,1.5,z,3.8,1.5,3.8);}}
+  if(map==='Factory'){for(const x of [-25,25])add(x,5,-20,4.4,5,4.4);}
+  return a;
+}
+function segmentHitsBox(sx,sy,sz,dx,dy,dz,maxDistance,b) {
+  let lo=0.05,hi=maxDistance;
+  for(const [s,d,mn,mx] of [[sx,dx,b.minX,b.maxX],[sy,dy,b.minY,b.maxY],[sz,dz,b.minZ,b.maxZ]]) {
+    if(Math.abs(d)<1e-8){if(s<mn||s>mx)return false;continue;}
+    let t1=(mn-s)/d,t2=(mx-s)/d;if(t1>t2)[t1,t2]=[t2,t1];
+    lo=Math.max(lo,t1);hi=Math.min(hi,t2);if(lo>hi)return false;
+  }
+  return hi>=0.05&&lo<=maxDistance;
+}
+function blockedByWorld(room,sx,sy,sz,dx,dy,dz,range) {
+  return worldSolids(room.map).some(b=>segmentHitsBox(sx,sy,sz,dx,dy,dz,range,b));
+}
+function insideWorldSolid(map,x,z,radius=0.62) {
+  return worldSolids(map).some(b=>x+radius>b.minX&&x-radius<b.maxX&&z+radius>b.minZ&&z-radius<b.maxZ);
+}
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: true } });
@@ -158,7 +186,8 @@ io.on('connection', socket => {
     if (!p || room.status !== 'playing' || !p.alive || !data) return;
     const x = Number(data.x), z = Number(data.z), yaw = Number(data.yaw), pitch = Number(data.pitch);
     if (![x,z,yaw,pitch].every(Number.isFinite)) return;
-    const nx = Math.max(-36, Math.min(36, x)), nz = Math.max(-36, Math.min(36, z));
+    const nx = Math.max(-40, Math.min(40, x)), nz = Math.max(-40, Math.min(40, z));
+    if (insideWorldSolid(room.map, nx, nz)) return;
     const dt = Math.max(0.03, Math.min(0.25, (Date.now() - p.lastMove) / 1000));
     const maxStep = 18 * dt + 2;
     const dx = nx - p.x, dz = nz - p.z, dist = Math.hypot(dx, dz);
@@ -182,7 +211,7 @@ io.on('connection', socket => {
       const along = vx*ray.x + vy*ray.y + vz*ray.z;
       if (along <= 0 || along > cfg.range) continue;
       const miss = Math.hypot(vx-ray.x*along, vy-ray.y*along, vz-ray.z*along);
-      if (miss < 1.35 && along < best) { target = t; best = along; }
+      if (miss < 1.35 && along < best && !blockedByWorld(room, shooter.x, shooter.y || 1.7, shooter.z, ray.x, ray.y, ray.z, along)) { target = t; best = along; }
     }
     io.to(room.code).emit('pulseFx', { id: shooter.id, x: shooter.x, y: shooter.y, z: shooter.z, dir: ray, hitId: target && target.id, at: now });
     if (!target) return;
