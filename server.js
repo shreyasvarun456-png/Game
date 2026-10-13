@@ -13,7 +13,7 @@ function worldSolids(map) {
   for(const side of [-1,1])for(let j=0;j<4;j++){const x=side*(20+j*3.5),z=(j%2?-1:1)*23;add(x,3.8,z,3.2,3.8,6);}
   if(map==='Desert'){for(let i=0;i<10;i++){const x=(i%5-2)*13,z=(i<5?-1:1)*29;add(x,1.5,z,3.8,1.5,3.8);}}
   if(map==='Factory'){for(const x of [-25,25])add(x,5,-20,4.4,5,4.4);}
-  if(map==='Docks'){for(const x of [-28,28])add(x,2.5,-12,5,2.5,5);for(const z of [-24,24])add(0,1.4,z,22,1.4,3);}
+  if(map==='Docks'){for(const x of [-25,25]){add(x,4,-15,7,4,7);add(x,4,12,7,4,7);}for(const z of [-30,28])add(0,2.6,z,22,2.6,1);}
   return a;
 }
 function segmentHitsBox(sx,sy,sz,dx,dy,dz,maxDistance,b) {
