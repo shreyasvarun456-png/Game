@@ -36,7 +36,7 @@ jobs:
           cat /tmp/health.json
           node -e "const fs=require('fs');const x=JSON.parse(fs.readFileSync('/tmp/health.json'));if(!x.ok)process.exit(1)"
           curl -fsS http://127.0.0.1:3000/socket.io/socket.io.js >/dev/null
-          curl -fsS http://127.0.0.1:3000/ | grep -q "TEAM ENERGY TAG"
+          curl -fsS http://127.0.0.1:3000/ | grep -q "TACTICAL FPS"
   deploy-pages:
     needs: test-backend
     runs-on: ubuntu-latest
