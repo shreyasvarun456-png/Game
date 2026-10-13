@@ -1,17 +1,25 @@
-# SHADOW OPS FPS
+# SHADOW OPS — Energy Tag Arena
 
-A browser-based 3D first-person shooter starter with realtime Socket.IO multiplayer, private invite-code rooms, balanced Alpha/Bravo teams, a host Play button, readiness, maps, weapon selection, basic demo-credit armory, mobile touch controls, kills/deaths, and score-to-30 team deathmatch.
+A browser-based 3D team arena with private invite-code rooms, live Alpha/Bravo rosters, a host Play button, map selection, Ready statuses, operator skins, pulse-tag devices, shield-based tag-outs, respawns, and score-to-30 matches. Includes on-screen touch controls for iPad.
 
-## Deploy
-This is a Node web service, not a static-only site. GitHub Pages cannot run the Socket.IO server.
+## Published site
 
-- Render service: runtime Node, build command \`npm install\`, start command \`npm start\`, health path \`/health\`, region Singapore.
-- GitHub Actions workflow runs syntax checks and a live HTTP smoke test on each push. It can also trigger a Render deployment if the repository secret \`RENDER_DEPLOY_HOOK\` is added.
-- On Render, open the service Settings and create a Deploy Hook. In GitHub, open Settings → Secrets and variables → Actions → New repository secret, name it \`RENDER_DEPLOY_HOOK\`, paste the hook URL, and save.
-- Free Render web services can sleep when inactive. The first visit may take a bit to wake.
+GitHub Actions publishes the static browser client to GitHub Pages at:
+
+https://shreyasvarun456-png.github.io/Game/
+
+The client connects to the online Socket.IO backend at https://shadow-ops-fps.onrender.com. GitHub Pages hosts static assets only; the Render Node service runs realtime rooms and game state.
+
+## Automatic publishing
+
+Every push to `main` runs JavaScript syntax checks and a backend HTTP/Socket.IO smoke test. If these pass, GitHub Actions deploys the `public/` directory to GitHub Pages. Render is also connected to this repository and auto-deploys Node server changes.
 
 ## Controls
-Desktop: WASD to move, mouse to look, click to fire, Space to jump, Shift to sprint.
-iPad: use the on-screen D-pad, drag the Look zone, and hold FIRE.
 
-This is a playable prototype, not a finished commercial game. Rooms and stats are in memory and reset if the server restarts. Three.js loads from a public CDN. Add stronger authoritative movement/collision, anti-cheat, moderation, persistent accounts, and production security before public launch.
+Desktop: WASD to move, click the arena to use mouse-look, click to send a pulse, Space to jump, Shift to sprint.
+
+ iPad: use the on-screen D-pad, drag the Look zone, and hold TAG.
+
+## Notes
+
+This is a playable prototype. Room data and scores are stored in memory and reset when the server restarts. The public Render free service can sleep during inactivity. Three.js is loaded from a public CDN. Add persistent accounts, moderation, rate limits, and more robust anti-cheat before a public launch.
