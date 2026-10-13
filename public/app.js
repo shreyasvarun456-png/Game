@@ -56,7 +56,7 @@ function initHeroScene(template){const host=$('hero-render');if(!host||heroRende
 function resizeHero(){if(!heroRenderer||!heroCamera)return;const host=$('hero-render');if(!host||!host.clientWidth||!host.clientHeight)return;heroRenderer.setSize(host.clientWidth,host.clientHeight,false);heroCamera.aspect=host.clientWidth/host.clientHeight;heroCamera.updateProjectionMatrix();}
 function loadOperatorModel(){import('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js').then(({GLTFLoader})=>{const loader=new GLTFLoader();loader.load('https://threejs.org/examples/models/gltf/Soldier.glb',gltf=>{operatorTemplate=gltf.scene;operatorTemplate.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});initHeroScene(operatorTemplate);upgradeOperators();},undefined,error=>console.warn('Detailed operator model unavailable; using built-in model.',error));}).catch(error=>console.warn('Detailed model loader unavailable; using built-in operator.',error));}
 function makeGroundTexture(map){const c=document.createElement('canvas');c.width=c.height=256;const ctx=c.getContext('2d');ctx.fillStyle=map==='Desert'?'#9c8a6c':map==='Factory'?'#626d70':map==='Docks'?'#547f88':'#56635f';ctx.fillRect(0,0,256,256);for(let i=0;i<9000;i++){const v=Math.floor(Math.random()*75);ctx.fillStyle='rgba('+v+','+v+','+v+','+(Math.random()*.22)+')';const size=Math.random()*2.4;ctx.fillRect(Math.random()*256,Math.random()*256,size,size);}if(map!=='Desert'){ctx.strokeStyle='rgba(20,27,29,.28)';ctx.lineWidth=1;for(let i=0;i<256;i+=32){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,256);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(256,i);ctx.stroke();}}const tex=new THREE.CanvasTexture(c);tex.anisotropy=4;return tex;}
-function buildArena(){if(!scene)return;arenaColliders=[];while(scene.children.length){const o=scene.children.pop();if(o.geometry)o.geometry.dispose();}remoteMeshes.clear();const map=state.room?.map||'Harbor';scene.background=new THREE.Color(map==='Desert'?0xc2a274:map==='Factory'?0x687781:map==='Docks'?0x4c899d:0x839aa1);scene.fog=new THREE.Fog(scene.background,35,100);const hemi=new THREE.HemisphereLight(0xe3f6ff,0x1d2730,1.35);scene.add(hemi);const sun=new THREE.DirectionalLight(0xffdfb2,3.0);sun.position.set(-14,28,10);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-48;sun.shadow.camera.right=48;sun.shadow.camera.top=48;sun.shadow.camera.bottom=-48;scene.add(sun);const floorTexture=makeGroundTexture(map);floorTexture.wrapS=floorTexture.wrapT=THREE.RepeatWrapping;floorTexture.repeat.set(14,14);floorTexture.colorSpace=THREE.SRGBColorSpace;const floorMat=new THREE.MeshStandardMaterial({color:map==='Desert'?0xb09a76:map==='Factory'?0x899296:map==='Docks'?0x547b82:0x8d9a95,map:floorTexture,roughness:.94});const floor=new THREE.Mesh(new THREE.PlaneGeometry(100,100),floorMat);floor.rotation.x=-Math.PI/2;floor.position.y=-.05;floor.receiveShadow=true;scene.add(floor);const grid=new THREE.GridHelper(100,45,0x7d9695,0x52666a);grid.position.y=.005;grid.material.transparent=true;grid.material.opacity=.18;scene.add(grid);const wallMat=new THREE.MeshStandardMaterial({color:0x2d4148,roughness:.9});const crateMat=new THREE.MeshStandardMaterial({color:map==='Desert'?0x9c8154:0x3b5158,roughness:.8});function box(x,y,z,w,h,d,mat,rot=0){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);o.position.set(x,y,z);o.rotation.y=rot;o.castShadow=true;o.receiveShadow=true;scene.add(o);if(y<3.2&&h>=1.0&&h<=5.5&&w>=0.8&&d>=0.8){const c=Math.abs(Math.cos(rot)),s=Math.abs(Math.sin(rot)),ex=(c*w+s*d)/2,ez=(s*w+c*d)/2;arenaColliders.push({minX:x-ex,maxX:x+ex,minZ:z-ez,maxZ:z+ez});}return o;}for(let i=-2;i<=2;i++){const z=i*12;box(-10,1.4,z,8,2.8,4,crateMat,.08);box(10,1.4,z+4,8,2.8,4,crateMat,-.08);box(i*8,1.1,z+6,3.2,2.2,3.2,wallMat,.2);box(i*7,2.4,z-8,8,4.8,3.8,crateMat,0);}for(let i=0;i<14;i++){const x=(i%7-3)*11,z=(Math.floor(i/7)?1:-1)*31;box(x,1.1,z,5,2.2,2.5,wallMat);}const darkMat=()=>new THREE.MeshStandardMaterial({color:0x26343a,roughness:.8});for(let i=-2;i<=2;i++){const pole=new THREE.Mesh(new THREE.CylinderGeometry(.12,.2,8,7),darkMat());pole.position.set(i*15,4,-35);scene.add(pole);const lamp=new THREE.PointLight(0xc8fae6,10,16);lamp.position.set(i*15,7,-35);scene.add(lamp);}// Add distinct visual landmarks so each deployment zone has a readable silhouette.
+function buildArena(){if(!scene)return;arenaColliders=[];while(scene.children.length){const o=scene.children.pop();if(o.geometry)o.geometry.dispose();}remoteMeshes.clear();const map=state.room?.map||'Harbor';scene.background=new THREE.Color(map==='Desert'?0xc2a274:map==='Factory'?0x687781:map==='Docks'?0x4c899d:0x839aa1);scene.fog=new THREE.Fog(scene.background,58,155);const hemi=new THREE.HemisphereLight(0xe3f6ff,0x1d2730,1.35);scene.add(hemi);const sun=new THREE.DirectionalLight(0xffdfb2,3.0);sun.position.set(-14,28,10);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-48;sun.shadow.camera.right=48;sun.shadow.camera.top=48;sun.shadow.camera.bottom=-48;scene.add(sun);const floorTexture=makeGroundTexture(map);floorTexture.wrapS=floorTexture.wrapT=THREE.RepeatWrapping;floorTexture.repeat.set(14,14);floorTexture.colorSpace=THREE.SRGBColorSpace;const floorMat=new THREE.MeshStandardMaterial({color:map==='Desert'?0xb09a76:map==='Factory'?0x899296:map==='Docks'?0x547b82:0x8d9a95,map:floorTexture,roughness:.94});const floor=new THREE.Mesh(new THREE.PlaneGeometry(100,100),floorMat);floor.rotation.x=-Math.PI/2;floor.position.y=-.05;floor.receiveShadow=true;scene.add(floor);const grid=new THREE.GridHelper(100,45,0x7d9695,0x52666a);grid.position.y=.005;grid.material.transparent=true;grid.material.opacity=.045;scene.add(grid);const wallMat=new THREE.MeshStandardMaterial({color:0x2d4148,roughness:.9});const crateMat=new THREE.MeshStandardMaterial({color:map==='Desert'?0x9c8154:0x3b5158,roughness:.8});function box(x,y,z,w,h,d,mat,rot=0){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);o.position.set(x,y,z);o.rotation.y=rot;o.castShadow=true;o.receiveShadow=true;scene.add(o);if(y<3.2&&h>=1.0&&h<=5.5&&w>=0.8&&d>=0.8){const c=Math.abs(Math.cos(rot)),s=Math.abs(Math.sin(rot)),ex=(c*w+s*d)/2,ez=(s*w+c*d)/2;arenaColliders.push({minX:x-ex,maxX:x+ex,minZ:z-ez,maxZ:z+ez});}return o;}for(let i=-2;i<=2;i++){const z=i*12;box(-10,1.4,z,8,2.8,4,crateMat,.08);box(10,1.4,z+4,8,2.8,4,crateMat,-.08);box(i*8,1.1,z+6,3.2,2.2,3.2,wallMat,.2);box(i*7,2.4,z-8,8,4.8,3.8,crateMat,0);}for(let i=0;i<14;i++){const x=(i%7-3)*11,z=(Math.floor(i/7)?1:-1)*31;box(x,1.1,z,5,2.2,2.5,wallMat);}const darkMat=()=>new THREE.MeshStandardMaterial({color:0x26343a,roughness:.8});for(let i=-2;i<=2;i++){const pole=new THREE.Mesh(new THREE.CylinderGeometry(.12,.2,8,7),darkMat());pole.position.set(i*15,4,-35);scene.add(pole);const lamp=new THREE.PointLight(0xc8fae6,10,16);lamp.position.set(i*15,7,-35);scene.add(lamp);}// Add distinct visual landmarks so each deployment zone has a readable silhouette.
 const trimMat=new THREE.MeshStandardMaterial({color:map==='Desert'?0xd2a35e:0x71858b,metalness:.42,roughness:.55});
 const stripeMat=new THREE.MeshStandardMaterial({color:map==='Factory'?0xe3a54a:map==='Desert'?0x3a4542:0xc8fa69,emissive:map==='Harbor'?0x26330c:0x000000,emissiveIntensity:.25,roughness:.5});
 for(let side of [-1,1]){
@@ -68,7 +68,67 @@ for(let side of [-1,1]){
   }
 }
 if(map==='Harbor'){
-  // Cargo-container ribs and gantry beams.
+  // Industrial freight yard: warehouse loading face, corrugated containers, dock gear and safety markings.
+  const concreteMat=new THREE.MeshStandardMaterial({color:0x555e60,roughness:.98});
+  const warehouseMat=new THREE.MeshStandardMaterial({color:0x657176,metalness:.18,roughness:.88});
+  const doorMat=new THREE.MeshStandardMaterial({color:0x263238,metalness:.3,roughness:.72});
+  const corrugationMat=new THREE.MeshStandardMaterial({color:0x879196,metalness:.5,roughness:.62});
+  const hazardMat=new THREE.MeshStandardMaterial({color:0xd6a52d,roughness:.78});
+  const glassDark=new THREE.MeshStandardMaterial({color:0x18272c,metalness:.38,roughness:.32});
+  // Large warehouse at the far end of the same central loading aisle.
+  box(0,5.3,-43,76,10.6,1.8,warehouseMat);
+  box(0,10.8,-43,78,.45,2.4,wallMat);
+  box(0,4.8,-41.95,74,.28,.18,trimMat);
+  for(let x=-32;x<=32;x+=8){
+    box(x,8.7,-41.94,4.4,1.25,.12,glassDark);
+    box(x,9.42,-41.86,4.7,.12,.18,trimMat);
+    box(x,8.0,-41.86,4.7,.12,.18,trimMat);
+  }
+  // Loading-bay doors with vertical slats, bumpers and overhead canopies.
+  for(let x of [-27,-18,-9,0,9,18,27]){
+    box(x,3.0,-41.91,5.5,5.7,.22,doorMat);
+    for(let y=.65;y<5.65;y+=.42)box(x,y,-41.76,5.22,.045,.06,corrugationMat);
+    box(x,5.95,-41.5,6.3,.28,1.25,wallMat);
+    box(x,5.75,-40.85,6.2,.10,.16,trimMat);
+    box(x-2.25,.55,-41.63,.28,1.0,.35,concreteMat);
+    box(x+2.25,.55,-41.63,.28,1.0,.35,concreteMat);
+    for(let q=-2;q<=2;q++)box(x+q*.26,.17,-39.9,.13,.025,1.2,hazardMat);
+    const lamp=new THREE.PointLight(0xffd7a1,2.1,8);lamp.position.set(x,6.65,-40.7);scene.add(lamp);
+    box(x,6.55,-41.4,.18,.14,.15,hazardMat);
+  }
+  // Container corrugations and corner castings follow the existing cargo layout.
+  for(let side of [-1,1]){
+    for(let i=-2;i<=2;i++){
+      const x=side*10, z=i*12+(side===1?4:0);
+      for(let q=-4;q<=4;q+=.42)box(x+q,1.4,z-2.04,.055,2.55,.055,corrugationMat);
+      for(let end of [-1,1]){
+        box(x+end*3.86,1.4,z, .18,2.7,4.12,trimMat);
+        box(x+end*3.86,.12,z,.24,.20,4.16,wallMat);
+        box(x+end*3.86,2.72,z,.24,.20,4.16,wallMat);
+      }
+    }
+  }
+  // Freight-yard ground detail: drainage, faded lane lines, tyre scuffs and pallet stacks.
+  for(let z=-32;z<=32;z+=16){
+    box(-3.2,.012,z,.09,.018,8,hazardMat);
+    box(3.2,.012,z,.09,.018,8,hazardMat);
+    box(0,.008,z,1.2,.02,.11,wallMat);
+    for(let x of [-1.8,1.8])box(x,.014,z, .07,.02,2.6,trimMat);
+  }
+  for(let x of [-35,35]){
+    box(x,.02,0,.24,.035,68,wallMat);
+    for(let z=-30;z<=30;z+=2.5)box(x,.045,z,.3,.025,.09,trimMat);
+  }
+  for(let x of [-34,34]){
+    for(let z of [-30,-15,0,15,30]){
+      const barrelMat=new THREE.MeshStandardMaterial({color:z%2?0x5a6468:0x7b4a2e,metalness:.22,roughness:.72});
+      const barrel=new THREE.Mesh(new THREE.CylinderGeometry(.38,.38,1.05,16),barrelMat);
+      barrel.position.set(x,.53,z);barrel.castShadow=true;scene.add(barrel);
+      for(let y of [.25,.76]){const ring=new THREE.Mesh(new THREE.TorusGeometry(.385,.035,6,16),trimMat);ring.rotation.x=Math.PI/2;ring.position.set(x,y,z);scene.add(ring);}
+      arenaColliders.push({minX:x-.48,maxX:x+.48,minZ:z-.48,maxZ:z+.48});
+    }
+  }
+  // Gantry beams and practical industrial lighting.
   for(let x of [-29,29]){box(x,5,-12,1,10,1,wallMat);box(x,9,-12,14,.6,1.1,trimMat);box(x,5,-12,1,.22,14,trimMat);}
   for(let z of [-27,27]){box(0,1.2,z,23,2.4,.35,trimMat);for(let x=-10;x<=10;x+=4)box(x,1.25,z-.22,.12,2,.12,wallMat);}
 }else if(map==='Desert'){
