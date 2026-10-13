@@ -94,3 +94,62 @@ html,body{background:#070b10}
  .game-bottom{z-index:2;bottom:4px}
  .touch-look{left:27%;right:24%;height:230px;padding-top:105px}
 }
+
+
+/* Tactical FPS controls and cinematic pass */
+#game-stage{position:relative;overflow:hidden;background:#090f12;border:1px solid #26343b;box-shadow:0 18px 65px #0008}
+#game-canvas{position:absolute;inset:0;z-index:0}
+#game-canvas canvas{display:block;width:100%;height:100%;touch-action:none;user-select:none}
+.game-top{z-index:4;background:linear-gradient(180deg,#060b10e8,#060b1040);padding:12px 15px}
+.game-bottom{z-index:4;background:linear-gradient(0deg,#060b10ee,#060b1033);padding:14px 16px}
+.crosshair{z-index:3;filter:drop-shadow(0 0 3px #000)}
+.killfeed{z-index:5}
+#camera-toggle{border-color:#c8fa69;color:#c8fa69;background:#0a1117e8}
+#camera-toggle:active{transform:scale(.96)}
+.touch-look{display:none;position:absolute;left:44%;right:112px;top:72px;bottom:0;height:auto;padding:0;color:#ffffff20;font-size:9px;letter-spacing:2px;align-items:center;justify-content:center;z-index:2;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;background:linear-gradient(120deg,transparent,#c8fa6905)}
+.touch-look span{position:absolute;bottom:39%;left:18%;opacity:.48;border:1px solid #c8fa6928;padding:7px 10px;border-radius:4px}
+.game-buttons{display:none;position:absolute;inset:0;align-items:stretch;justify-content:space-between;padding:0;z-index:5;pointer-events:none;touch-action:none}
+.move-control{position:absolute;left:max(18px,env(safe-area-inset-left));bottom:max(20px,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:5px;pointer-events:none}
+.move-control>small{font-size:8px;font-weight:900;letter-spacing:2px;color:#dce7e6a8;text-shadow:0 1px 4px #000}
+.move-stick{width:142px;height:142px;border-radius:50%;display:grid;place-items:center;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none}
+.stick-ring{width:118px;height:118px;border-radius:50%;border:1px solid #e1f1e84f;background:radial-gradient(circle,#1b2a30aa 0,#0a131ab0 70%);box-shadow:inset 0 0 0 9px #ffffff06,0 5px 24px #0007;display:grid;place-items:center}
+.stick-knob{width:54px;height:54px;border-radius:50%;border:1px solid #d8eee4a0;background:linear-gradient(145deg,#9cbbb7,#263a40 68%);box-shadow:0 3px 10px #0009,inset 0 1px #ffffff7a;transform:translate(0,0);will-change:transform}
+.action-controls{position:absolute;right:max(17px,env(safe-area-inset-right));bottom:max(24px,env(safe-area-inset-bottom));display:flex;flex-direction:column-reverse;align-items:center;gap:14px;pointer-events:none}
+.action-controls button{pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;display:grid;place-items:center;font-size:11px;font-weight:900;letter-spacing:1px;text-shadow:0 1px 3px #000}
+#fire-button{width:78px;height:78px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#e77d70,#802e2b 72%);border:2px solid #ffc0a6;box-shadow:0 0 0 5px #ed65511a,0 6px 22px #0009;color:#fff}
+#jump-button{position:static;width:58px;height:58px;min-width:58px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#647a83,#17262d 75%);border:1px solid #c3d4d66b;color:#f5fbfb;box-shadow:0 5px 18px #0008}
+#fire-button:active,#jump-button:active{filter:brightness(1.25);transform:scale(.96)}
+@media (pointer:coarse){
+  #game-stage{height:calc(100dvh - 12px);min-height:430px;border:0}
+  .view:has(#game-stage){padding:0;max-width:none}
+  body:has(#game-view:not(.hidden)){overflow:hidden}
+  .topbar:has(~ #game-view:not(.hidden)){display:none}
+  .game-buttons{display:block!important}
+  .touch-look{display:flex!important}
+  .controls-hint{display:none}
+  .game-top .mode-tag{max-width:105px}
+  .game-top .mode-tag b{font-size:9px}
+  .game-top .mode-tag small{font-size:8px}
+  .game-top .match-actions{gap:4px}
+  .game-top .match-actions .btn{font-size:8px;padding:0 7px;min-height:34px}
+  .game-bottom{bottom:0;left:0;right:0;padding:9px 10px;min-height:66px}
+  .game-bottom .health small,.game-bottom .tool-hud small,.game-bottom .personal-stats small{font-size:7px}
+  .game-bottom .health b,.game-bottom .personal-stats b,.game-bottom .tool-hud b{font-size:12px}
+}
+@media(max-width:560px){
+  #game-stage{height:100dvh;min-height:420px}
+  .game-top{padding:8px 8px}
+  .game-top .score{top:58px}
+  .game-top .match-actions .btn{padding:0 5px;letter-spacing:0}
+  .touch-look{left:37%;right:94px;top:72px}
+  .move-stick{width:125px;height:125px}
+  .stick-ring{width:104px;height:104px}
+  .stick-knob{width:48px;height:48px}
+  .move-control{left:8px;bottom:94px}
+  .action-controls{right:10px;bottom:95px;gap:10px}
+  #fire-button{width:67px;height:67px}
+  #jump-button{width:51px;height:51px;min-width:51px}
+  .game-bottom{padding:7px 8px;min-height:62px}
+  .health{min-width:75px}
+  .tool-hud{max-width:115px}
+}
