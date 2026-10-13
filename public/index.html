@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#090f15">
+<title>SHADOW OPS — Multiplayer FPS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+<div class="topbar"><div class="brand"><span class="brand-mark">S</span><div>SHADOW<span>OPS</span><small>TACTICAL NETWORK</small></div></div><div class="top-right"><span class="network"><i></i><b id="network-label">CONNECTING</b></span><span class="operator-pill" id="operator-pill">OPERATOR</span></div></div>
+<main id="home-view" class="view">
+  <section class="hero">
+    <div class="hero-copy"><div class="eyebrow"><span class="dash"></span> MULTIPLAYER COMBAT SYSTEM <span class="version">BUILD 01</span></div>
+      <h1>FIGHT.<br><em>TEAM.</em><br>WIN.</h1>
+      <p>Deploy with your squad. Pick your loadout. Own the arena.</p>
+      <div class="actions"><button class="btn primary" id="hero-play">▶ &nbsp; PLAY NOW</button><button class="btn outline" id="hero-create">＋ CREATE PRIVATE ROOM</button></div>
+      <div class="hero-meta"><span><b>05v05</b> TEAM DEATHMATCH</span><span><b>03</b> DEPLOYMENT ZONES</span><span><b>LIVE</b> MULTIPLAYER</span></div>
+    </div>
+    <div class="hero-scene"><div class="scene-badge"><i></i> LIVE OPERATIONS</div><div class="hero-soldier"></div><div class="scene-grid"></div><div class="scene-bottom"><span>OPERATION: IRON HARBOR</span><b>01 / 03</b></div></div>
+  </section>
+  <section class="section-head"><div><span class="eyebrow">MISSION SELECT</span><h2>READY FOR <em>DEPLOYMENT?</em></h2></div><span class="muted">CHOOSE YOUR ENTRY</span></section>
+  <section class="mission-grid">
+    <article class="mission-card c1"><div class="card-num">01 / QUICK ENTRY</div><div class="mission-icon">⌁</div><h3>QUICK MATCH</h3><p>Join an open squad and jump into the next match.</p><button class="text-btn" id="quick-play">FIND A MATCH <b>↗</b></button></article>
+    <article class="mission-card c2"><div class="card-num">02 / SQUAD PLAY</div><div class="mission-icon">♧</div><h3>PRIVATE ROOM</h3><p>Make a squad room. Invite friends with a five-character code.</p><button class="text-btn" id="open-create">CREATE ROOM <b>↗</b></button></article>
+    <article class="mission-card c3"><div class="card-num">03 / LOADOUT</div><div class="mission-icon">⌖</div><h3>THE ARMORY</h3><p>Choose a primary weapon and operator skin before deployment.</p><button class="text-btn" id="open-armory">OPEN ARMORY <b>↗</b></button></article>
+  </section>
+  <section class="join-strip"><div class="join-glyph">↗</div><div><b>YOUR SQUAD IS WAITING</b><small>Have a room code? Enter it to join your friends.</small></div><input id="home-code" maxlength="5" placeholder="ROOM CODE" autocomplete="off"><button class="btn primary small" id="home-join">JOIN ROOM →</button></section>
+  <footer><span>SHADOW OPS // MULTIPLAYER TEST BUILD</span><span>PLAY FAIR. WATCH YOUR SIX.</span></footer>
+</main>
+<main id="lobby-view" class="view hidden">
+  <div class="page-title"><button class="back" id="lobby-back">← BASE</button><div><span class="eyebrow">SQUAD ASSEMBLY // WAITING FOR DEPLOYMENT</span><h1>MISSION <em>LOBBY</em></h1></div><div class="room-code"><small>ROOM INVITE CODE</small><strong id="room-code">-----</strong><button id="copy-invite">▣ COPY INVITE</button></div></div>
+  <div class="lobby-columns"><section class="panel roster-panel"><div class="panel-head"><div><span class="eyebrow">SQUAD MANIFEST</span><h2>OPERATORS <span id="roster-count">01/10</span></h2></div><span class="live-tag"><i></i> LIVE ROOM</span></div><div id="roster" class="roster"></div><div class="team-legend"><span class="blue-dot"></span> ALPHA TEAM <span class="red-dot"></span> BRAVO TEAM</div></section>
+  <section class="panel setup-panel"><div class="panel-head"><div><span class="eyebrow">HOST CONFIGURATION</span><h2>MISSION SETUP</h2></div><span class="lock">◈ PRIVATE</span></div><label class="field-label" for="lobby-map">DEPLOYMENT ZONE</label><select id="lobby-map" class="field"><option value="Harbor">IRON HARBOR</option><option value="Desert">DUSTFRONT OUTPOST</option><option value="Factory">BLACKSITE FACTORY</option></select><label class="field-label">PRIMARY WEAPON</label><div class="gun-picks"><button data-gun="Ranger" class="gun-pick selected"><b>RANGER</b><small>ASSAULT RIFLE</small><span>DMG 34 · BALANCED</span></button><button data-gun="Viper" class="gun-pick"><b>VIPER</b><small>SUBMACHINE GUN</small><span>DMG 18 · FAST FIRE</span></button><button data-gun="Bulldog" class="gun-pick"><b>BULLDOG</b><small>HEAVY RIFLE</small><span>DMG 65 · CLOSE RANGE</span></button></div><label class="field-label">OPERATOR SKIN</label><div class="skin-picks"><button class="skin selected" data-skin="default"><i class="skin-green"></i> RECON</button><button class="skin" data-skin="arctic"><i class="skin-white"></i> ARCTIC</button><button class="skin" data-skin="ember"><i class="skin-red"></i> EMBER</button></div><p class="small-note">Loadout updates instantly. Cosmetic unlocks use demo credits in this build.</p></section></div>
+  <div class="lobby-bottom"><div class="lobby-tip"><span>ⓘ</span><div><b>READY WHEN YOU ARE</b><small>The host can start with any squad size up to 10 players.</small></div></div><button class="btn outline" id="ready-button">✓ I'M READY</button><button class="btn primary play-btn" id="start-match">▶ &nbsp; PLAY <b>→</b></button></div>
+</main>
+<main id="armory-view" class="view hidden"><div class="page-title"><button class="back" id="armory-back">← BASE</button><div><span class="eyebrow">EQUIPMENT // FIELD SUPPLY</span><h1>THE <em>ARMORY</em></h1></div><div class="credits"><span>◈</span><div><small>DEMO CREDITS</small><b id="credit-count">1200</b></div></div></div><div class="armory-grid" id="armory-grid"></div><button class="btn outline" id="armory-return">← RETURN TO BASE</button></main>
+<main id="game-view" class="view hidden">
+  <div id="game-stage"><div id="game-canvas"></div><div class="crosshair"><i></i><b></b><i></i><em></em></div>
+    <div class="game-top"><div class="mode-tag"><i></i><div><b>TEAM DEATHMATCH</b><small id="game-map-label">IRON HARBOR</small></div></div><div class="score"><span class="alpha">ALPHA <b id="score-blue">0</b></span><strong>:</strong><span class="bravo">BRAVO <b id="score-red">0</b></span></div><button class="btn dark small" id="leave-match">LEAVE MATCH</button></div>
+    <div class="killfeed" id="killfeed"></div><div class="game-bottom"><div class="health"><small>VITALS</small><b id="hp-value">100</b><div><i id="hp-bar"></i></div></div><div class="weapon-hud"><small id="hud-gun">RANGER</small><b>∞ <span>TRAINING AMMO</span></b></div><div class="controls-hint">WASD MOVE · MOUSE AIM · CLICK FIRE · SHIFT SPRINT</div></div>
+    <div class="game-buttons"><div class="dpad"><button data-move="forward">▲</button><div><button data-move="left">◀</button><button data-move="back">▼</button><button data-move="right">▶</button></div></div><div class="touch-look" id="look-zone">DRAG TO LOOK</div><button id="fire-button" class="fire-button">FIRE</button><button id="jump-button" class="jump-button">JUMP</button></div>
+    <div id="game-message" class="game-message hidden"><div class="message-card"><span class="eyebrow">MISSION REPORT</span><h2 id="game-message-title">MATCH COMPLETE</h2><p id="game-message-text"></p><button class="btn primary" id="return-lobby">RETURN TO LOBBY</button><button class="btn outline" id="game-home">BASE</button></div></div>
+  </div>
+</main>
+<div id="modal" class="modal hidden"><div class="modal-card"><button class="modal-x" id="modal-close">×</button><span class="eyebrow">SQUAD SETUP</span><h2 id="modal-title">CREATE A <em>ROOM</em></h2><p id="modal-copy">Choose your callsign and room settings.</p><label class="field-label" for="callsign">CALLSIGN</label><input id="callsign" class="field" maxlength="16" placeholder="Your operator name"><label id="code-label" class="field-label hidden" for="join-code">ROOM CODE</label><input id="join-code" class="field code-field hidden" maxlength="5" placeholder="ABCDE" autocomplete="off"><label class="field-label" for="create-map">DEPLOYMENT MAP</label><select id="create-map" class="field"><option value="Harbor">IRON HARBOR</option><option value="Desert">DUSTFRONT OUTPOST</option><option value="Factory">BLACKSITE FACTORY</option></select><label class="check-row"><input type="checkbox" id="private-check" checked><span><b>PRIVATE ROOM</b><small>Only friends with the code can join.</small></span></label><button id="modal-confirm" class="btn primary full">CREATE ROOM →</button></div></div>
+<div id="toast" class="toast"></div>
+<script type="module" src="/app.js"></script>
+</body></html>
