@@ -8,12 +8,12 @@ const { Server } = require('socket.io');
 function worldSolids(map) {
   const a=[];
   const add=(x,y,z,w,h,d)=>a.push({minX:x-w/2,maxX:x+w/2,minY:0,maxY:h,minZ:z-d/2,maxZ:z+d/2});
-  add(0,4,-43,90,4,2);add(0,4,43,90,4,2);add(-43,4,0,2,4,90);add(43,4,0,2,4,90);
   for(let i=-2;i<=2;i++){const z=i*12;add(-10,2.8,z,8,2.8,4);add(10,2.8,z+4,8,2.8,4);add(i*8,2.2,z+6,3.2,2.2,3.2);add(i*7,4.8,z-8,8,4.8,3.8);}
   for(let i=0;i<14;i++){const x=(i%7-3)*11,z=(Math.floor(i/7)?1:-1)*31;add(x,2.2,z,5,2.2,2.5);}
   for(const side of [-1,1])for(let j=0;j<4;j++){const x=side*(20+j*3.5),z=(j%2?-1:1)*23;add(x,3.8,z,3.2,3.8,6);}
   if(map==='Desert'){for(let i=0;i<10;i++){const x=(i%5-2)*13,z=(i<5?-1:1)*29;add(x,1.5,z,3.8,1.5,3.8);}}
   if(map==='Factory'){for(const x of [-25,25])add(x,5,-20,4.4,5,4.4);}
+  if(map==='Docks'){for(const x of [-28,28])add(x,2.5,-12,5,2.5,5);for(const z of [-24,24])add(0,1.4,z,22,1.4,3);}
   return a;
 }
 function segmentHitsBox(sx,sy,sz,dx,dy,dz,maxDistance,b) {
@@ -40,11 +40,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 const rooms = new Map();
 const MAX_PLAYERS = 10;
 const MATCH_TARGET = 30;
-const MAPS = new Set(['Harbor', 'Desert', 'Factory']);
+const MAPS = new Set(['Harbor', 'Desert', 'Factory', 'Docks']);
 const TAG_TOOLS = {
   Pulse: { interval: 190, tagPower: 34, range: 65 },
   Arc: { interval: 115, tagPower: 18, range: 55 },
-  Nova: { interval: 330, tagPower: 65, range: 29 }
+  Nova: { interval: 330, tagPower: 65, range: 29 },
+  Sniper: { interval: 650, tagPower: 100, range: 100 }
 };
 
 app.get('/health', (_req, res) => res.json({ ok: true, game: 'Shadow Ops Energy Tag', rooms: rooms.size }));
@@ -61,7 +62,7 @@ function cleanName(value) {
 }
 function makeRoom(hostId, data) {
   const code = makeCode();
-  const room = { code, hostId, privateRoom: !data || data.privateRoom !== false, map: MAPS.has(data && data.map) ? data.map : 'Harbor', status: 'lobby', players: new Map(), score: { blue: 0, red: 0 }, feed: [] };
+  const room = { code, hostId, privateRoom: !data || data.privateRoom !== false, map: MAPS.has(data && data.map) ? data.map : 'Harbor', status: 'lobby', players: new Map(), score: { blue: 0, red: 0 }, feed: [], mapVotes: new Map(), mapVoteTimer: null };
   rooms.set(code, room);
   return room;
 }
@@ -78,9 +79,24 @@ function publicPlayer(p) {
   return { id: p.id, name: p.name, team: p.team, x: p.x, y: p.y, z: p.z, yaw: p.yaw, pitch: p.pitch, hp: p.hp, kills: p.kills, deaths: p.deaths, alive: p.alive, ready: p.ready, tool: p.tool, skin: p.skin };
 }
 function snapshot(room) {
-  return { code: room.code, privateRoom: room.privateRoom, map: room.map, status: room.status, hostId: room.hostId, players: [...room.players.values()].map(publicPlayer), score: room.score, target: MATCH_TARGET, maxPlayers: MAX_PLAYERS, feed: room.feed.slice(-6) };
+  return { code: room.code, privateRoom: room.privateRoom, map: room.map, status: room.status, hostId: room.hostId, players: [...room.players.values()].map(publicPlayer), score: room.score, target: MATCH_TARGET, maxPlayers: MAX_PLAYERS, feed: room.feed.slice(-6), mapVotes: Object.fromEntries(room.mapVotes || []) };
 }
 function broadcast(room) { io.to(room.code).emit('roomState', snapshot(room)); }
+function finishMapVote(room) {
+  if (!room || room.status !== 'ended') return;
+  if (room.mapVoteTimer) clearTimeout(room.mapVoteTimer);
+  room.mapVoteTimer = null;
+  const tally = new Map([...MAPS].map(m => [m, 0]));
+  for (const map of room.mapVotes.values()) if (tally.has(map)) tally.set(map, tally.get(map) + 1);
+  const high = Math.max(0, ...tally.values());
+  const tied = [...tally].filter(([, n]) => n === high).map(([m]) => m);
+  if (high > 0) room.map = tied.includes(room.map) ? room.map : tied[crypto.randomInt(tied.length)];
+  room.status = 'lobby'; room.score = { blue: 0, red: 0 };
+  for (const p of room.players.values()) { p.ready = false; p.alive = true; p.hp = 100; }
+  say(room, 'Next map selected: ' + room.map);
+  broadcast(room);
+  io.to(room.code).emit('returnedToLobby', snapshot(room));
+}
 function say(room, text) {
   room.feed.push({ text: String(text).slice(0, 110), at: Date.now() });
   room.feed = room.feed.slice(-12);
@@ -172,9 +188,18 @@ io.on('connection', socket => {
     io.to(room.code).emit('matchStarted', snapshot(room));
     broadcast(room);
   });
+  socket.on('voteMap', map => {
+    const room = currentRoom(socket);
+    if (!room || room.status !== 'ended' || !MAPS.has(map)) return;
+    room.mapVotes.set(socket.id, map);
+    const votes = Object.fromEntries([...MAPS].map(m => [m, [...room.mapVotes.values()].filter(v => v === m).length]));
+    io.to(room.code).emit('mapVoteUpdate', { votes, seconds: room.mapVoteTimer ? 15 : 0 });
+    if (room.mapVotes.size >= room.players.size) finishMapVote(room);
+  });
   socket.on('returnToLobby', () => {
     const room = currentRoom(socket);
     if (!room || !['playing', 'ended'].includes(room.status)) return;
+    if (room.mapVoteTimer) clearTimeout(room.mapVoteTimer); room.mapVoteTimer = null;
     room.status = 'lobby'; room.score = { blue: 0, red: 0 };
     for (const p of room.players.values()) { p.ready = false; p.alive = true; p.hp = 100; }
     say(room, 'The squad returned to the lobby');
@@ -224,8 +249,11 @@ io.on('connection', socket => {
       io.to(room.code).emit('tagOut', { shooterId: shooter.id, targetId: target.id, score: room.score });
       if (room.score[shooter.team] >= MATCH_TARGET) {
         room.status = 'ended';
-        io.to(room.code).emit('matchEnded', { winner: shooter.team, score: room.score });
+        room.mapVotes.clear();
+        io.to(room.code).emit('matchEnded', { winner: shooter.team, score: room.score, maps: [...MAPS], voteSeconds: 15 });
+        io.to(room.code).emit('mapVoteUpdate', { votes: {}, seconds: 15 });
         broadcast(room);
+        room.mapVoteTimer = setTimeout(() => finishMapVote(room), 15000);
       } else {
         const code = room.code, targetId = target.id;
         setTimeout(() => { const r = rooms.get(code), pl = r && r.players.get(targetId); if (r && pl && r.status === 'playing') respawn(r, pl); }, 2200);
