@@ -1,12 +1,17 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
-const socket = io(
+const socket = typeof io === 'function' ? io(
   location.hostname === 'localhost' ||
   location.hostname === '127.0.0.1' ||
   location.hostname.endsWith('.onrender.com')
     ? undefined
     : (window.SHADOW_MULTIPLAYER_SERVER || location.origin)
-);
+) : {
+  connected: false,
+  on() { return this; },
+  emit() { return false; },
+  disconnect() {}
+};
 const $ = id => document.getElementById(id);
 const state = { selfId:null, room:null, view:'home', name:localStorage.getItem('shadowName')||'OPERATOR', tool:localStorage.getItem('shadowTool')||'Pulse', skin:localStorage.getItem('shadowSkin')||'default', credits:Number(localStorage.getItem('shadowCredits')||1200), ready:false };
 let modalMode='create', quickStartRequested=false, quickStartTimer=null, toastTimer=null, scene=null, camera=null, renderer=null, clock=null, local={x:0,y:1.7,z:0,yaw:0,pitch:0,vy:0}, keys={}, remoteMeshes=new Map(), arenaBuilt=false, lastMoveAt=0, lastPulseAt=0, lookPointer=null, lookStart=null, movePointer=null, touchMove={x:0,z:0}, isJumping=false, gameActive=false, tagHeld=false, toolMesh=null, mapBuilt='', thirdPerson=false, localAvatar=null, killCount=0, deathCount=0, operatorTemplate=null, heroRenderer=null, heroScene=null, heroCamera=null, heroModel=null;
