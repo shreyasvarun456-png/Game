@@ -162,3 +162,11 @@ html,body{background:#070b10}
 #hero-render.has-model~.hero-soldier{display:none}
 .hero-scene:after{z-index:2}
 @media(prefers-reduced-motion:reduce){.hero-render canvas{animation:none}}
+
+/* SHADOW OPS weapon controls and tactile combat feedback */
+.reload-button{height:42px;min-width:68px;border-radius:22px;background:linear-gradient(145deg,#445861,#142229);border:1px solid #9aafb5aa;color:#f5fbfb;font-size:9px;font-weight:900;letter-spacing:.8px;box-shadow:0 4px 16px #0009}
+.reload-button:active{transform:scale(.95);filter:brightness(1.25)}
+#charge-value span{display:inline-block;color:#b7c5c9;font-size:8px;letter-spacing:.8px}
+#fire-button{position:relative}
+#fire-button:after{content:"";position:absolute;inset:-7px;border:1px solid #ffb08c55;border-radius:50%;pointer-events:none}
+@media(pointer:coarse){.action-controls{gap:10px}.reload-button{width:60px;min-width:60px;height:36px;font-size:8px}.game-bottom .tool-hud{min-width:90px}.tool-hud b{font-size:21px}}
