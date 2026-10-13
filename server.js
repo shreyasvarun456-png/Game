@@ -211,7 +211,7 @@ io.on('connection', socket => {
     if (!p || room.status !== 'playing' || !p.alive || !data) return;
     const x = Number(data.x), z = Number(data.z), yaw = Number(data.yaw), pitch = Number(data.pitch);
     if (![x,z,yaw,pitch].every(Number.isFinite)) return;
-    const nx = Math.max(-40, Math.min(40, x)), nz = Math.max(-40, Math.min(40, z));
+    const nx = Math.max(-48, Math.min(48, x)), nz = Math.max(-48, Math.min(48, z));
     if (insideWorldSolid(room.map, nx, nz)) return;
     const dt = Math.max(0.03, Math.min(0.25, (Date.now() - p.lastMove) / 1000));
     const maxStep = 18 * dt + 2;
