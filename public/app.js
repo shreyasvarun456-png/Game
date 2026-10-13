@@ -29,7 +29,7 @@ socket.on('roomState',r=>{if(!state.room||state.room.code===r.code){state.room=r
 socket.on('feed',f=>{if(state.view==='game')addFeed(f.text);});
 socket.on('matchStarted',r=>{state.room=r;localPlayer();renderRoom();launchGame();});
 socket.on('returnedToLobby',r=>{state.room=r;gameActive=false;$('map-vote').classList.add('hidden');$('game-message').classList.add('hidden');showView('lobby');renderRoom();});
-socket.on('matchEnded',d=>{gameActive=false;$('game-message-title').textContent=d.winner===myTeam()?'VICTORY':'MATCH OVER';$('game-message-text').textContent='ALPHA '+d.score.blue+' — BRAVO '+d.score.red+'. Vote for the next map below.';$('map-vote').classList.remove('hidden');$('map-vote-status').textContent='Voting closes in '+(d.voteSeconds||15)+' seconds.';$('game-message').classList.remove('hidden');});
+socket.on('matchEnded',d=>{if(state.room)state.room.status='ended';gameActive=false;$('game-message-title').textContent=d.winner===myTeam()?'VICTORY':'MATCH OVER';$('game-message-text').textContent='ALPHA '+d.score.blue+' — BRAVO '+d.score.red+'. Vote for the next map below.';$('map-vote').classList.remove('hidden');$('map-vote-status').textContent='Voting closes in '+(d.voteSeconds||15)+' seconds.';$('game-message').classList.remove('hidden');});
 socket.on('mapVoteUpdate',d=>{const votes=d.votes||{};$('map-vote-status').textContent='Votes — '+Object.entries(votes).map(([m,n])=>m+': '+n).join(' · ');});
 socket.on('tagHit',d=>{if(d.targetId===state.selfId){$('hp-value').textContent=d.hp;$('hp-bar').style.width=d.hp+'%';}});
 socket.on('tagOut',d=>{if(d.targetId===state.selfId){deathCount++;streakCount=0;$('death-count').textContent=deathCount;toast('ELIMINATED — STREAK RESET');addFeed('YOU WERE ELIMINATED');}if(d.shooterId===state.selfId){killCount++;streakCount++;$('kill-count').textContent=killCount;toast('ELIMINATION +1');addFeed('ENEMY ELIMINATED  +1');if(streakCount>=3&&!localStorage.getItem('ownedArc')){localStorage.setItem('ownedArc','1');toast('3 STREAK: ARC TAGGER UNLOCKED');}if(streakCount>=5&&!localStorage.getItem('ownedNova')){localStorage.setItem('ownedNova','1');toast('5 STREAK: NOVA TAGGER UNLOCKED');}if(streakCount>=8&&!localStorage.getItem('ownedCyan')){localStorage.setItem('ownedCyan','1');toast('8 STREAK: CYAN WEAPON SKIN UNLOCKED');}}});
@@ -72,7 +72,7 @@ if(map==='Harbor'){
   for(let x of [-29,29]){box(x,5,-12,1,10,1,wallMat);box(x,9,-12,14,.6,1.1,trimMat);box(x,5,-12,1,.22,14,trimMat);}
   for(let z of [-27,27]){box(0,1.2,z,23,2.4,.35,trimMat);for(let x=-10;x<=10;x+=4)box(x,1.25,z-.22,.12,2,.12,wallMat);}
 }else if(map==='Desert'){
-  for(let i=0;i<10;i++){const x=(i%5-2)*13,z=(i<5?-1:1)*29;const rock=new THREE.Mesh(new THREE.DodecahedronGeometry(1.5+(i%3)*.4,0),crateMat);rock.position.set(x,.8,z);rock.scale.y=.65;scene.add(rock);}
+  for(let i=0;i<10;i++){const x=(i%5-2)*13,z=(i<5?-1:1)*29;const rock=new THREE.Mesh(new THREE.DodecahedronGeometry(1.5+(i%3)*.4,0),crateMat);rock.position.set(x,.8,z);rock.scale.y=.65;scene.add(rock);arenaColliders.push({minX:x-1.9,maxX:x+1.9,minZ:z-1.9,maxZ:z+1.9});}
   for(let x of [-31,31]){const mast=new THREE.Mesh(new THREE.CylinderGeometry(.12,.2,9,8),wallMat);mast.position.set(x,4.5,-8);scene.add(mast);box(x,8.8,-8,1.5,.18,1.5,stripeMat);}
 }else if(map==='Docks'){
   const dockMat=new THREE.MeshStandardMaterial({color:0x876c4e,roughness:.9});
@@ -82,7 +82,7 @@ if(map==='Harbor'){
   for(const x of [-25,25]){box(x,2,-15,7,4,7,crateMat);box(x,2,12,7,4,7,crateMat);}
   for(let z of [-30,28]){box(0,1.3,z,22,2.6,1,wallMat);for(let x=-10;x<=10;x+=4)box(x,1.4,z-.65,.15,2.3,.15,trimMat);}
 }else{
-  for(let x of [-25,25]){const tank=new THREE.Mesh(new THREE.CylinderGeometry(2.2,2.2,5,18),wallMat);tank.position.set(x,2.5,-20);scene.add(tank);const cap=new THREE.Mesh(new THREE.CylinderGeometry(2.2,2.2,.25,18),trimMat);cap.position.set(x,5.1,-20);scene.add(cap);for(let y=1;y<5;y+=1.5)box(x, y,-17.75,4.8,.08,.08,stripeMat);}
+  for(let x of [-25,25]){const tank=new THREE.Mesh(new THREE.CylinderGeometry(2.2,2.2,5,18),wallMat);tank.position.set(x,2.5,-20);scene.add(tank);arenaColliders.push({minX:x-2.2,maxX:x+2.2,minZ:-22.2,maxZ:-17.8});const cap=new THREE.Mesh(new THREE.CylinderGeometry(2.2,2.2,.25,18),trimMat);cap.position.set(x,5.1,-20);scene.add(cap);for(let y=1;y<5;y+=1.5)box(x, y,-17.75,4.8,.08,.08,stripeMat);}
   for(let z=-20;z<=20;z+=10){const pipe=new THREE.Mesh(new THREE.CylinderGeometry(.16,.16,45,10),trimMat);pipe.rotation.z=Math.PI/2;pipe.position.set(0,6,z);scene.add(pipe);}
 }
 for(let x=-36;x<=36;x+=12){box(x,.015,0,.045,.025,70,stripeMat);box(0,.016,x,70,.025,.045,stripeMat);}
