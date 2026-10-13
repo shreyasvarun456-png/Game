@@ -153,3 +153,12 @@ html,body{background:#070b10}
   .health{min-width:75px}
   .tool-hud{max-width:115px}
 }
+
+.hero-render{position:absolute;inset:0;z-index:0;overflow:hidden;background:linear-gradient(125deg,#101c21,#26373b 50%,#10171c)}
+.hero-render canvas{width:100%;height:100%;display:block}
+.hero-scene:before{z-index:1;pointer-events:none}
+.hero-scene>.scene-grid{z-index:2;pointer-events:none;opacity:.45}
+.hero-scene>.scene-badge,.hero-scene>.scene-bottom{z-index:3}
+#hero-render.has-model~.hero-soldier{display:none}
+.hero-scene:after{z-index:2}
+@media(prefers-reduced-motion:reduce){.hero-render canvas{animation:none}}
