@@ -173,3 +173,6 @@ html,body{background:#070b10}
 
 /* Aim toggle state */
 #aim-toggle[aria-pressed="true"]{border-color:var(--lime);color:var(--lime);box-shadow:0 0 0 1px #c8fa6933 inset}
+
+/* Next-round map voting and four-map loadout layout */
+.map-vote{width:100%;max-width:520px;margin:18px auto;display:flex;flex-direction:column;gap:10px;align-items:center}.map-vote-options{display:flex;flex-wrap:wrap;justify-content:center;gap:7px}.map-vote-options .btn{min-height:36px;font-size:10px}.map-vote>small{color:#c4d3d7;font-size:11px;text-align:center}.tool-picks{grid-template-columns:repeat(2,minmax(0,1fr))}@media(max-width:560px){.map-vote-options .btn{flex:1;min-width:42%;padding:0 8px}.tool-picks{grid-template-columns:1fr}}
