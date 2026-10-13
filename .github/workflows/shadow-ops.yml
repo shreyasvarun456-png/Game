@@ -32,7 +32,7 @@ jobs:
           node -e "const fs=require('fs');const x=JSON.parse(fs.readFileSync('/tmp/health.json'));if(!x.ok)process.exit(1)"
           curl -fsS http://127.0.0.1:3000/socket.io/socket.io.js >/dev/null
       - name: Trigger Render deployment when configured
-        if: ${{ secrets.RENDER_DEPLOY_HOOK != '' }}
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        if: ${{ env.RENDER_DEPLOY_HOOK != '' }}
         run: curl --fail --silent --show-error --request POST "$RENDER_DEPLOY_HOOK"
