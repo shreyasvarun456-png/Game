@@ -186,3 +186,6 @@ html,body{background:#070b10}
 #scope-overlay .scope-range{position:absolute;left:50%;bottom:18%;transform:translateX(-50%);font:700 10px monospace;letter-spacing:2px;color:#e1e8df;text-shadow:0 1px 3px #000;white-space:nowrap}
 #game-stage.scoped .crosshair{opacity:0}
 #game-stage.scoped #scope-overlay{display:block}
+
+/* Multiplayer diagnostics and offline bot mode */
+.network-actions{display:flex;gap:5px;align-items:center}.net-btn{background:#111b21;border:1px solid #354650;color:#dce8eb;font-size:9px;font-weight:900;letter-spacing:.7px;padding:7px 9px;min-height:28px}.net-btn:hover,.net-btn.net-online{border-color:var(--lime);color:var(--lime)}#bot-play{border-color:#526d73;color:#b8efeb}#bot-play:hover{border-color:var(--cyan);color:var(--cyan)}@media(max-width:700px){.topbar{padding:0 12px;height:68px}.top-right{gap:7px}.network{max-width:92px;font-size:8px;letter-spacing:.2px}.network-actions{gap:3px}.net-btn{padding:6px 5px;font-size:8px}.operator-pill{display:none}.actions .btn{padding:0 12px}}
