@@ -176,3 +176,13 @@ html,body{background:#070b10}
 
 /* Next-round map voting and four-map loadout layout */
 .map-vote{width:100%;max-width:520px;margin:18px auto;display:flex;flex-direction:column;gap:10px;align-items:center}.map-vote-options{display:flex;flex-wrap:wrap;justify-content:center;gap:7px}.map-vote-options .btn{min-height:36px;font-size:10px}.map-vote>small{color:#c4d3d7;font-size:11px;text-align:center}.tool-picks{grid-template-columns:repeat(2,minmax(0,1fr))}@media(max-width:560px){.map-vote-options .btn{flex:1;min-width:42%;padding:0 8px}.tool-picks{grid-template-columns:1fr}}
+
+/* 4x rifle optic: true zoom, circular scope glass and fine reticle */
+#scope-overlay{position:absolute;inset:0;z-index:9;display:none;pointer-events:none;background:radial-gradient(circle at center,transparent 0 31%,rgba(0,0,0,.84) 32% 100%)}
+#scope-overlay .scope-glass{position:absolute;width:min(68vmin,540px);height:min(68vmin,540px);max-width:76vw;max-height:76vw;left:50%;top:50%;transform:translate(-50%,-50%);border:9px solid #111719;border-radius:50%;box-shadow:0 0 0 3px #778186,0 0 24px #000;background:radial-gradient(circle,rgba(34,47,42,.08),rgba(5,10,11,.08));overflow:hidden}
+#scope-overlay .scope-v{position:absolute;left:50%;top:0;bottom:0;width:1px;background:#e6eee2bb}
+#scope-overlay .scope-h{position:absolute;top:50%;left:0;right:0;height:1px;background:#e6eee2bb}
+#scope-overlay .scope-dot{position:absolute;left:calc(50% - 3px);top:calc(50% - 3px);width:6px;height:6px;border:1px solid #fff;background:#e2edcf;border-radius:50%}
+#scope-overlay .scope-range{position:absolute;left:50%;bottom:18%;transform:translateX(-50%);font:700 10px monospace;letter-spacing:2px;color:#e1e8df;text-shadow:0 1px 3px #000;white-space:nowrap}
+#game-stage.scoped .crosshair{opacity:0}
+#game-stage.scoped #scope-overlay{display:block}
