@@ -10,6 +10,7 @@ const socket = typeof io === 'function' ? io(
   connected: false,
   on() { return this; },
   emit() { return false; },
+  connect() { return this; },
   disconnect() {}
 };
 const $ = id => document.getElementById(id);
