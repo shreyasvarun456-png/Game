@@ -213,3 +213,8 @@ html,body{background:#070b10}
 .action-controls button{pointer-events:auto!important;position:relative;z-index:21!important}
 #flashlight-button,#laser-button{min-height:38px;position:relative;z-index:21}
 @media(pointer:coarse){.action-controls{right:max(10px,env(safe-area-inset-right));bottom:max(88px,calc(env(safe-area-inset-bottom) + 82px));gap:7px}.action-controls button{min-height:36px}#sprint-button,#crouch-button{width:64px;min-width:64px}}
+
+/* High-visibility tactical controls on touch screens */
+#game-buttons .action-controls{z-index:80!important;pointer-events:none!important}
+#game-buttons .action-controls button{pointer-events:auto!important;touch-action:none!important;min-height:40px;box-shadow:0 3px 12px #000b;border:1px solid #c3d0d0}
+#flashlight-button,#laser-button{display:grid!important;visibility:visible!important;opacity:1!important}
