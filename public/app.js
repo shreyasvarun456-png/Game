@@ -64,7 +64,16 @@ for(let side of [-1,1]){
  const elbow=new THREE.Mesh(new THREE.SphereGeometry(.14,10,8),armor);elbow.position.set(side*.43,.91,-.03);g.add(elbow);
 }
 const chestRig=new THREE.Mesh(new THREE.BoxGeometry(.40,.26,.055),dark);chestRig.position.set(0,1.18,-.24);g.add(chestRig);
-for(let i=0;i<3;i++){const mag=new THREE.Mesh(new THREE.BoxGeometry(.075,.16,.04),trimMatAvatar);mag.position.set((i-1)*.12,1.16,-.278);g.add(mag);}
+for(let i=0;i<3;i++){const mag=new THREE.Mesh(new THREE.BoxGeometry(.075,.16,.04),trimMatAvatar);mag.position.set((i-1)*.12,1.16,-.278);mag.castShadow=true;g.add(mag);}
+const neck=new THREE.Mesh(new THREE.CylinderGeometry(.105,.12,.13,12),dark);neck.position.set(0,1.43,0);g.add(neck);
+const chestPlate=new THREE.Mesh(new THREE.BoxGeometry(.39,.29,.07),armor);chestPlate.position.set(0,1.14,-.25);g.add(chestPlate);
+for(let side of [-1,1]){
+ const strapDetail=new THREE.Mesh(new THREE.BoxGeometry(.055,.48,.035),trimMatAvatar);strapDetail.position.set(side*.22,1.13,-.267);strapDetail.rotation.z=side*.09;g.add(strapDetail);
+ const thigh=new THREE.Mesh(new THREE.BoxGeometry(.24,.18,.29),mat);thigh.position.set(side*.17,.49,-.015);g.add(thigh);
+ const bootToe=new THREE.Mesh(new THREE.BoxGeometry(.19,.10,.16),dark);bootToe.position.set(side*.17,.085,-.19);g.add(bootToe);
+ const kneeStrap=new THREE.Mesh(new THREE.BoxGeometry(.25,.045,.29),trimMatAvatar);kneeStrap.position.set(side*.17,.36,-.13);g.add(kneeStrap);
+}
+
 const shoulderRadio=new THREE.Mesh(new THREE.BoxGeometry(.13,.17,.11),dark);shoulderRadio.position.set(-.25,1.32,.01);g.add(shoulderRadio);
 const radioAntenna=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,.28,6),dark);radioAntenna.position.set(-.28,1.52,.02);radioAntenna.rotation.z=-.10;g.add(radioAntenna);
 const kneePadMaterial=armor;
@@ -292,6 +301,23 @@ gunPart(new THREE.CylinderGeometry(.058,.058,.09,14),gunEdge,.32,-.26,-1.405,Mat
 gunPart(new THREE.BoxGeometry(.20,.035,.32),gunMetal,.32,-.188,-.90);
 for(let z=-1.04;z<-.72;z+=.065){gunPart(new THREE.BoxGeometry(.164,.018,.027),gunEdge,.32,-.263,z);gunPart(new THREE.BoxGeometry(.018,.09,.025),gunEdge,.235,-.27,z);gunPart(new THREE.BoxGeometry(.018,.09,.025),gunEdge,.405,-.27,z);}
 gunPart(new THREE.BoxGeometry(.075,.025,.60),gunEdge,.32,-.174,-.65);
+ // More convincing rifle furniture: adjustable stock, raised sights, ejection port,
+ // charging handle, selector, front sight tower, and a perforated handguard.
+ gunPart(new THREE.BoxGeometry(.13,.12,.28),gunPolymer,.32,-.275,-.035);
+ gunPart(new THREE.BoxGeometry(.095,.095,.10),gunEdge,.32,-.245,-.16);
+ gunPart(new THREE.BoxGeometry(.045,.035,.14),gunMetal,.43,-.235,-.47);
+ gunPart(new THREE.BoxGeometry(.065,.045,.12),gunEdge,.215,-.225,-.56);
+ gunPart(new THREE.BoxGeometry(.035,.105,.04),gunMetal,.32,-.115,-1.08);
+ gunPart(new THREE.BoxGeometry(.16,.035,.055),gunEdge,.32,-.17,-1.10);
+ gunPart(new THREE.BoxGeometry(.065,.045,.07),gunMetal,.32,-.11,-.27);
+ gunPart(new THREE.BoxGeometry(.035,.055,.045),gunEdge,.405,-.22,-.45);
+ // Individual receiver pins and rail slots add readable metal detail at close range.
+ for(const side of [-1,1]){
+  for(const z of [-.42,-.58,-.73]){
+   const pin=gunPart(new THREE.CylinderGeometry(.014,.014,.012,10),gunEdge,.32+side*.097,-.29,z,Math.PI/2);
+  }
+ }
+
 gunPart(new THREE.BoxGeometry(.105,.07,.20),gunEdge,.32,-.125,-.88);
 gunPart(new THREE.CylinderGeometry(.066,.066,.39,18),gunMetal,.32,-.075,-.86,Math.PI/2);
 gunPart(new THREE.CylinderGeometry(.085,.085,.055,18),gunEdge,.32,-.075,-.68,Math.PI/2);
