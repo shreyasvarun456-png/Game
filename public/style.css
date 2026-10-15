@@ -192,3 +192,6 @@ html,body{background:#070b10}
 
 /* Functional in-match map selector */
 .match-map-wrap{display:flex;align-items:center;gap:5px;background:#091218e8;border:1px solid #53666d;padding:3px 5px;border-radius:3px}.match-map-wrap label{font-size:8px;letter-spacing:1px;font-weight:900;color:#c8fa69}.match-map-wrap select{max-width:92px;background:#15232b;color:#fff;border:1px solid #43565e;padding:7px 5px;font:800 8px Inter,Arial,sans-serif;letter-spacing:.5px;min-height:28px}.match-map-wrap.hidden{display:none!important}@media(max-width:560px){.match-map-wrap{gap:2px;padding:2px}.match-map-wrap label{display:none}.match-map-wrap select{max-width:62px;padding:5px 2px;font-size:7px}}
+
+/* Cinematic tactical battlefield treatment */
+#game-stage{background:#39352e!important;box-shadow:0 24px 80px #000b;border-color:#50483c}#game-canvas{background:linear-gradient(#7e8c90,#c0ac90 65%,#55493b)}.hero-scene{background:linear-gradient(130deg,#212a2a,#5c5a49 54%,#151a17)!important}.hero-scene:after{background:radial-gradient(ellipse at 65% 30%,#e9c48a22,transparent 44%),linear-gradient(90deg,#090d0bb8,transparent 65%)!important}.hero-soldier{filter:drop-shadow(12px 12px 22px #000b)!important;background:linear-gradient(105deg,#6a6a56,#34372d 55%,#111511)!important}
