@@ -203,3 +203,13 @@ html,body{background:#070b10}
 #scope-overlay .scope-range{background:#08100dbb;padding:5px 9px;border:1px solid #dfe9d944;border-radius:4px;bottom:13%}
 #game-stage.scoped #scope-overlay .scope-glass{box-shadow:0 0 0 3px #7f8a88,0 0 24px #000,inset 0 0 20px #0005}
 @media(pointer:coarse){#crouch-button{width:60px;min-width:60px;height:38px;font-size:7px}.action-controls{gap:8px}}
+
+/* iPad control visibility + daylight/lighting fix */
+#sprint-button{position:static;width:60px;min-width:60px;height:38px;border-radius:22px;background:linear-gradient(145deg,#7b6539,#2b2112);border:1px solid #e6c77c;color:#fff3cf;font-size:8px;font-weight:900;letter-spacing:.4px;box-shadow:0 4px 16px #0009}
+#sprint-button.active,#sprint-button[aria-pressed="true"]{background:#c8fa69;color:#111a10;border-color:#efffc7}
+#crouch-button{display:grid!important;place-items:center;position:static!important;visibility:visible!important;opacity:1!important}
+#sprint-button{display:grid!important;place-items:center;visibility:visible!important;opacity:1!important}
+.action-controls{pointer-events:none!important;z-index:20!important}
+.action-controls button{pointer-events:auto!important;position:relative;z-index:21!important}
+#flashlight-button,#laser-button{min-height:38px;position:relative;z-index:21}
+@media(pointer:coarse){.action-controls{right:max(10px,env(safe-area-inset-right));bottom:max(88px,calc(env(safe-area-inset-bottom) + 82px));gap:7px}.action-controls button{min-height:36px}#sprint-button,#crouch-button{width:64px;min-width:64px}}
