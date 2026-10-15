@@ -235,7 +235,7 @@ function buildArena(){
  scene.background=new THREE.Color(0x9ca9aa);
  scene.fog=new THREE.Fog(0x9ca9aa,110,220);
  const hemi=new THREE.HemisphereLight(0xdbe6e8,0x403a30,1.8);scene.add(hemi);
- const sun=new THREE.DirectionalLight(0xffd6a0,2.1);sun.position.set(-18,30,12);sun.castShadow=false;scene.add(sun);
+ const sun=new THREE.DirectionalLight(0xffe0b5,2.35);sun.position.set(-24,38,18);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-58;sun.shadow.camera.right=58;sun.shadow.camera.top=58;sun.shadow.camera.bottom=-58;sun.shadow.camera.near=.5;sun.shadow.camera.far=120;sun.shadow.bias=-.00025;scene.add(sun);
  const dirtCanvas=document.createElement('canvas');dirtCanvas.width=dirtCanvas.height=512;const dctx=dirtCanvas.getContext('2d');
  const groundBase=map==='Desert'?'#88745d':map==='Factory'?'#555956':map==='Docks'?'#59635d':'#625a4c';dctx.fillStyle=groundBase;dctx.fillRect(0,0,512,512);
  for(let i=0;i<900;i++){const x=Math.random()*512,y=Math.random()*512,rx=3+Math.random()*28,ry=2+Math.random()*14;dctx.fillStyle=Math.random()>.5?'rgba(20,18,15,.10)':'rgba(190,168,132,.09)';dctx.beginPath();dctx.ellipse(x,y,rx,ry,Math.random()*3.14,0,Math.PI*2);dctx.fill();}
@@ -279,6 +279,45 @@ function buildArena(){
  // Keep optional art isolated: a failed decoration can never prevent the base map loading.
  try{if(typeof addRuggedBattlefield==='function')addRuggedBattlefield(box,wallMat,trimMat,stripeMat,map);}catch(e){console.warn('Optional terrain detail skipped',e);}
  try{if(typeof addBackroomsArea==='function')addBackroomsArea(box,wallMat,trimMat,stripeMat);}catch(e){console.warn('Optional secret area skipped',e);}
+ // Environmental dressing: layered concrete seams, weather streaks, drains, fences and industrial fixtures.
+ const seamConcrete=new THREE.MeshStandardMaterial({color:0x555b58,roughness:.98});
+ const rustMetal=new THREE.MeshStandardMaterial({color:0x594b3c,metalness:.42,roughness:.82});
+ const warningPaint=new THREE.MeshStandardMaterial({color:0xb09b57,roughness:.88});
+ const glassDark=new THREE.MeshStandardMaterial({color:0x172426,metalness:.25,roughness:.22,emissive:0x071012});
+ // Concrete expansion joints and worn painted lane markers.
+ for(let z=-30;z<=30;z+=10){box(0,.012,z,112,.018,.055,seamConcrete);box(-2,.018,z+2,5,.025,.08,warningPaint,-.08);}
+ // Corrugated warehouse wall panels and utility doors on the outer structures.
+ for(const side of [-1,1])for(let k=0;k<7;k++){
+  const z=-22+k*7.1,x=side*32.68;
+  for(let rib=0;rib<5;rib++){const panel=new THREE.Mesh(new THREE.BoxGeometry(.045,3.3,.035),trimMat);panel.position.set(x,2.65,z-.95+rib*.43);panel.castShadow=true;scene.add(panel);}
+  if(k%2===0){box(x-side*.04,1.45,z,.08,2.65,1.55,darkMetal);box(x-side*.10,1.48,z,.07,2.4,1.28,wallMat);box(x-side*.15,2.65,z,.04,.08,1.38,rustMetal);}
+  const vent=new THREE.Mesh(new THREE.BoxGeometry(.08,.36,1.15),darkMetal);vent.position.set(x-side*.07,4.15,z);scene.add(vent);
+  for(let sl=0;sl<4;sl++){const fin=new THREE.Mesh(new THREE.BoxGeometry(.10,.025,1.1),trimMat);fin.position.set(x-side*.13,4.02+sl*.075,z);scene.add(fin);}
+ }
+ // Industrial perimeter fencing: posts, rails and fine mesh panels.
+ for(const side of [-1,1]){
+  for(let z=-34;z<=34;z+=4){const post=new THREE.Mesh(new THREE.BoxGeometry(.12,2.35,.12),darkMetal);post.position.set(side*43,1.17,z);post.castShadow=true;scene.add(post);}
+  for(const y of [.35,2.15]){const rail=new THREE.Mesh(new THREE.BoxGeometry(.055,.055,68),rustMetal);rail.position.set(side*43,y,0);scene.add(rail);}
+  const meshMat=new THREE.MeshStandardMaterial({color:0x4c5551,metalness:.35,roughness:.8,wireframe:true});
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(68,1.72,34,8),meshMat);mesh.position.set(side*43,1.25,0);mesh.rotation.y=side*Math.PI/2;scene.add(mesh);
+ }
+ // Floodlight poles and lamps to create believable silhouettes and local highlights.
+ for(const [x,z] of [[-42,-28],[42,-28],[-42,28],[42,28],[-18,34],[18,34]]){
+  const pole=new THREE.Mesh(new THREE.CylinderGeometry(.09,.15,7.5,8),darkMetal);pole.position.set(x,3.75,z);pole.castShadow=true;scene.add(pole);
+  const arm=new THREE.Mesh(new THREE.BoxGeometry(1.15,.09,.11),darkMetal);arm.position.set(x+(x<0?.48:-.48),7.25,z);scene.add(arm);
+  const lamp=new THREE.Mesh(new THREE.BoxGeometry(.48,.16,.34),trimMat);lamp.position.set(x+(x<0?.92:-.92),7.17,z);scene.add(lamp);
+  const glow=new THREE.Mesh(new THREE.BoxGeometry(.34,.035,.23),new THREE.MeshStandardMaterial({color:0xffe4a8,emissive:0x5b4721,emissiveIntensity:.6}));glow.position.set(lamp.position.x,7.08,z);scene.add(glow);
+ }
+ // Drain grates and oil-dark patches near the wreck and cover.
+ for(const [x,z] of [[-5,5],[14,-4],[2,15],[-17,-2]]){
+  const grate=new THREE.Mesh(new THREE.BoxGeometry(2.2,.025,.75),darkMetal);grate.position.set(x,.012,z);scene.add(grate);
+  for(let n=0;n<8;n++){const bar=new THREE.Mesh(new THREE.BoxGeometry(.035,.03,.68),trimMat);bar.position.set(x-1+n*.28,.03,z);scene.add(bar);}
+ }
+ // Add shallow roof-mounted ducts and exhaust pipes to break up the boxy silhouettes.
+ for(const side of [-1,1])for(const z of [-15,15]){
+  const duct=new THREE.Mesh(new THREE.BoxGeometry(1.05,.45,2.8),darkMetal);duct.position.set(side*34.1,5.35,z);scene.add(duct);
+  for(let n=0;n<3;n++){const band=new THREE.Mesh(new THREE.BoxGeometry(1.12,.045,.07),rustMetal);band.position.set(side*34.1,5.18,z-.8+n*.8);scene.add(band);}
+ }
  const gunMetal=new THREE.MeshStandardMaterial({color:0x242b2d,metalness:.78,roughness:.3});
 const weaponFinish=localStorage.getItem('shadowWeaponSkin')||'standard';const gunPolymer=new THREE.MeshStandardMaterial({color:weaponFinish==='cyan'?0x18cbd0:weaponFinish==='gold'?0xc99b36:0x151b1d,metalness:weaponFinish==='gold' ? 0.72 : 0.15,roughness:weaponFinish==='gold' ? 0.3 : 0.58});
 const gunEdge=new THREE.MeshStandardMaterial({color:0x465257,metalness:.7,roughness:.32});
