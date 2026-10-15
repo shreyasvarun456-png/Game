@@ -204,27 +204,37 @@ function addRuggedBattlefield(box,wallMat,trimMat,stripeMat,map){
   for(let z=-18;z<=18;z+=6){box(26,1.6,z,2.8,3.2,3.4,wallMat);box(26,3.3,z,.35,.12,3.5,trimMat);}
  }
 }
-function buildArena(){if(!scene)return;arenaColliders=[];while(scene.children.length){const o=scene.children.pop();if(o.geometry)o.geometry.dispose();}remoteMeshes.clear();const map=state.room?.map||'Harbor';scene.background=makeSkyTexture(map);scene.fog=new THREE.Fog(new THREE.Color(map==='Desert'?0xb0a08c:0x96958b),95,175);const hemi=new THREE.HemisphereLight(0xd5e1e5,0x302c25,1.18);scene.add(hemi);const sun=new THREE.DirectionalLight(0xffd6a0,2.45);sun.position.set(-14,28,10);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-48;sun.shadow.camera.right=48;sun.shadow.camera.top=48;sun.shadow.camera.bottom=-48;scene.add(sun);const floorTexture=makeGroundTexture(map);floorTexture.wrapS=floorTexture.wrapT=THREE.RepeatWrapping;floorTexture.repeat.set(5,5);floorTexture.colorSpace=THREE.SRGBColorSpace;const floorMat=new THREE.MeshStandardMaterial({color:map==='Desert'?0xd0b18b:map==='Factory'?0x99938a:map==='Docks'?0x7f8b7e:0xa19a8a,map:floorTexture,roughness:1,metalness:0});const floor=new THREE.Mesh(new THREE.PlaneGeometry(100,100),floorMat);floor.rotation.x=-Math.PI/2;floor.position.y=-.05;floor.receiveShadow=true;scene.add(floor);// No arcade grid: terrain detail comes from the dirt texture, grass, rocks and debris.const wallMat=new THREE.MeshStandardMaterial({color:map==='Desert'?0x776956:map==='Factory'?0x555c5d:0x4a4a43,roughness:.97,metalness:.04});const crateMat=new THREE.MeshStandardMaterial({color:map==='Desert'?0x816b50:map==='Factory'?0x4c5555:0x5c5a4d,roughness:.9,metalness:.08});function box(x,y,z,w,h,d,mat,rot=0){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);o.position.set(x,y,z);o.rotation.y=rot;o.castShadow=true;o.receiveShadow=true;scene.add(o);if(y-h/2<3.4&&y+h/2>.55&&h>=1.0&&w>=.8&&d>=.8&&w<40&&d<40){const c=Math.abs(Math.cos(rot)),s=Math.abs(Math.sin(rot)),ex=(c*w+s*d)/2,ez=(s*w+c*d)/2;arenaColliders.push({minX:x-ex,maxX:x+ex,minZ:z-ez,maxZ:z+ez});}return o;}if(map!=='Harbor'){for(let i=-2;i<=2;i++){const z=i*12;box(-10,1.1,z,6.5,2.2,3.6,crateMat,.08);box(10,1.1,z+4,6.5,2.2,3.6,crateMat,-.08);if(i!==0)box(i*8,1.05,z+6,2.8,2.1,2.8,wallMat,.2);}for(let i=0;i<10;i++){const x=(i%5-2)*13,z=(Math.floor(i/5)?1:-1)*30;box(x,.8,z,4,1.6,2.5,wallMat);}}const darkMat=()=>new THREE.MeshStandardMaterial({color:0x343735,roughness:.86});for(let i=-2;i<=2;i++){const pole=new THREE.Mesh(new THREE.CylinderGeometry(.1,.18,7,9),darkMat());pole.position.set(i*15,3.5,-35);scene.add(pole);const lamp=new THREE.PointLight(0xd9c39b,2.2,12);lamp.position.set(i*15,6.4,-35);scene.add(lamp);}// Add distinct visual landmarks so each deployment zone has a readable silhouette.
-const trimMat=new THREE.MeshStandardMaterial({color:map==='Desert'?0xd2a35e:0x71858b,metalness:.42,roughness:.55});
-const stripeMat=new THREE.MeshStandardMaterial({color:map==='Factory'?0xe3a54a:map==='Desert'?0x3a4542:0xc8fa69,emissive:map==='Harbor'?0x26330c:0x000000,emissiveIntensity:.25,roughness:.5});
-// The original bright block stacks are replaced by map-specific tactical dressing.
-// Always build a simple, visible combat arena first so the match remains playable
-// even if optional cinematic dressing fails on a mobile browser.
-for(let side of [-1,1]){
- for(let i=0;i<5;i++){
-  const z=-20+i*10;
-  box(side*15,1.35,z,3.2,2.7,4.2,crateMat,side*.035);
-  box(side*25,1.0,z+4,4.4,2.0,3.0,wallMat,side*.06);
+function buildArena(){
+ if(!scene)throw new Error('Scene not initialized');
+ arenaColliders=[];remoteMeshes.clear();
+ const map=state.room?.map||'Harbor';
+ scene.background=new THREE.Color(0x9ca9aa);
+ scene.fog=new THREE.Fog(0x9ca9aa,110,220);
+ const hemi=new THREE.HemisphereLight(0xdbe6e8,0x403a30,1.8);scene.add(hemi);
+ const sun=new THREE.DirectionalLight(0xffd6a0,2.1);sun.position.set(-18,30,12);sun.castShadow=false;scene.add(sun);
+ const floorMat=new THREE.MeshStandardMaterial({color:map==='Desert'?0x8b765e:map==='Factory'?0x5b605f:map==='Docks'?0x59665f:0x625a4c,roughness:1});
+ const floor=new THREE.Mesh(new THREE.PlaneGeometry(120,120),floorMat);floor.rotation.x=-Math.PI/2;floor.position.y=-.06;floor.receiveShadow=true;scene.add(floor);
+ const wallMat=new THREE.MeshStandardMaterial({color:0x454943,roughness:.96});
+ const crateMat=new THREE.MeshStandardMaterial({color:0x665744,roughness:.93});
+ const trimMat=new THREE.MeshStandardMaterial({color:0x77766a,roughness:.8});
+ const stripeMat=new THREE.MeshStandardMaterial({color:0x777052,roughness:1});
+ function box(x,y,z,w,h,d,mat,rot=0){
+  const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);o.position.set(x,y,z);o.rotation.y=rot;o.castShadow=true;o.receiveShadow=true;scene.add(o);
+  if(y-h/2<3.4&&y+h/2>.55&&h>=1&&w>=.8&&d>=.8){const c=Math.abs(Math.cos(rot)),s=Math.abs(Math.sin(rot)),ex=(c*w+s*d)/2,ez=(s*w+c*d)/2;arenaColliders.push({minX:x-ex,maxX:x+ex,minZ:z-ez,maxZ:z+ez});}
+  return o;
  }
-}
-box(-2,1.15,-8,5.2,2.3,1.2,crateMat);
-box(5,1.15,1,4.4,2.3,1.2,wallMat);
-box(-8,1.05,9,4.2,2.1,1.4,crateMat);
-try{addRuggedBattlefield(box,wallMat,trimMat,stripeMat,map);}catch(err){console.error('Optional battlefield dressing failed; keeping basic arena',err);}
-try{addBackroomsArea(box,wallMat,trimMat,stripeMat);}catch(err){console.error('Backrooms dressing failed',err);}
-
-
-const gunMetal=new THREE.MeshStandardMaterial({color:0x242b2d,metalness:.78,roughness:.3});
+ // Guaranteed visible cover in every map, laid out around a clear central lane.
+ for(let side of [-1,1])for(let i=0;i<5;i++){
+  const z=-20+i*10;box(side*14,1.2,z,3.5,2.4,4.5,crateMat,side*.035);box(side*25,.95,z+4,4.5,1.9,3.2,wallMat,side*.05);
+ }
+ box(-2,1.05,-8,5.2,2.1,1.2,crateMat);box(5,1.05,1,4.4,2.1,1.2,wallMat);box(-8,1.0,9,4.2,2,1.4,crateMat);
+ // Distinct skyline silhouettes and low barricades.
+ for(let side of [-1,1])for(let i=0;i<3;i++){const z=-15+i*15;box(side*34,2.6,z,2.5,5.2,8,wallMat);box(side*34,5.3,z,2.8,.2,8,trimMat);}
+ for(let i=-2;i<=2;i++){const pole=new THREE.Mesh(new THREE.CylinderGeometry(.12,.18,5,8),wallMat);pole.position.set(i*15,2.5,-36);scene.add(pole);}
+ // Keep optional art isolated: a failed decoration can never prevent the base map loading.
+ try{if(typeof addRuggedBattlefield==='function')addRuggedBattlefield(box,wallMat,trimMat,stripeMat,map);}catch(e){console.warn('Optional terrain detail skipped',e);}
+ try{if(typeof addBackroomsArea==='function')addBackroomsArea(box,wallMat,trimMat,stripeMat);}catch(e){console.warn('Optional secret area skipped',e);}
+ const gunMetal=new THREE.MeshStandardMaterial({color:0x242b2d,metalness:.78,roughness:.3});
 const weaponFinish=localStorage.getItem('shadowWeaponSkin')||'standard';const gunPolymer=new THREE.MeshStandardMaterial({color:weaponFinish==='cyan'?0x18cbd0:weaponFinish==='gold'?0xc99b36:0x151b1d,metalness:weaponFinish==='gold' ? 0.72 : 0.15,roughness:weaponFinish==='gold' ? 0.3 : 0.58});
 const gunEdge=new THREE.MeshStandardMaterial({color:0x465257,metalness:.7,roughness:.32});
 const glassMat=new THREE.MeshStandardMaterial({color:0x152c30,metalness:.25,roughness:.14,transparent:true,opacity:.9,emissive:0x082326});
