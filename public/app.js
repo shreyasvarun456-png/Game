@@ -140,15 +140,14 @@ function addRuggedBattlefield(box,wallMat,trimMat,stripeMat,map){
   const m=new THREE.Mesh(g,leafMat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m;
  }
  // Broken cliff line beyond the fight lane, with irregular boulders instead of a hard flat wall.
- for(let z=-25;z<=25;z+=2.6){const h=3.2+Math.random()*5.4,s=1.2+Math.random()*2.2;
+ for(let z=-25;z<=25;z+=2.6){if(Math.abs(z-8)<4.6)continue;const h=3.2+Math.random()*5.4,s=1.2+Math.random()*2.2;
   rock(37+Math.random()*2,h*.38,z+(Math.random()-.5)*1.4,s,h*.65,1.8+Math.random()*1.6,Math.random()>.5?dirtRock:darkRock,true);}
  for(let i=0;i<52;i++){
   const x=-9+Math.random()*44,z=(Math.random()>.5?1:-1)*(8+Math.random()*17);
   const s=.3+Math.random()*1.15;rock(x,s*.53,z,s*(.8+Math.random()),s*.55,s*(.8+Math.random()),Math.random()>.65?sunRock:dirtRock, s>1.0&&Math.random()>.45);
  }
  // A broken, muddy road remains open through the middle.
- const pathMat=new THREE.MeshStandardMaterial({color:0x625341,roughness:1});
- const path=new THREE.Mesh(new THREE.PlaneGeometry(52,13),pathMat);path.rotation.x=-Math.PI/2;path.position.set(7,-.034,0);path.receiveShadow=true;scene.add(path);
+ // A softly worn path is painted into the procedural mud texture; no hard-edged overlay.
  // Tufts of grass: instanced so the scene stays light enough for an iPad.
  const grassGeo=new THREE.ConeGeometry(.045,.34,4);
  const grassGreen=new THREE.MeshStandardMaterial({color:0x4c5637,roughness:1,side:THREE.DoubleSide});
