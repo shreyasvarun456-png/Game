@@ -195,3 +195,11 @@ html,body{background:#070b10}
 
 /* Cinematic tactical battlefield treatment */
 #game-stage{background:#39352e!important;box-shadow:0 24px 80px #000b;border-color:#50483c}#game-canvas{background:linear-gradient(#7e8c90,#c0ac90 65%,#55493b)}.hero-scene{background:linear-gradient(130deg,#212a2a,#5c5a49 54%,#151a17)!important}.hero-scene:after{background:radial-gradient(ellipse at 65% 30%,#e9c48a22,transparent 44%),linear-gradient(90deg,#090d0bb8,transparent 65%)!important}.hero-soldier{filter:drop-shadow(12px 12px 22px #000b)!important;background:linear-gradient(105deg,#6a6a56,#34372d 55%,#111511)!important}
+
+/* iPad stance controls and scope HUD polish */
+#crouch-button{position:static;width:60px;min-width:60px;height:42px;border-radius:22px;background:linear-gradient(145deg,#59666a,#182329);border:1px solid #c6d1d2a0;color:#f6fbfb;font-size:8px;letter-spacing:.4px;box-shadow:0 4px 16px #0009}
+#crouch-button[aria-pressed="true"]{border-color:#c8fa69;color:#c8fa69;background:#18251d}
+.action-controls{gap:9px}
+#scope-overlay .scope-range{background:#08100dbb;padding:5px 9px;border:1px solid #dfe9d944;border-radius:4px;bottom:13%}
+#game-stage.scoped #scope-overlay .scope-glass{box-shadow:0 0 0 3px #7f8a88,0 0 24px #000,inset 0 0 20px #0005}
+@media(pointer:coarse){#crouch-button{width:60px;min-width:60px;height:38px;font-size:7px}.action-controls{gap:8px}}
