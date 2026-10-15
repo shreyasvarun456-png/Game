@@ -208,8 +208,21 @@ function buildArena(){if(!scene)return;arenaColliders=[];while(scene.children.le
 const trimMat=new THREE.MeshStandardMaterial({color:map==='Desert'?0xd2a35e:0x71858b,metalness:.42,roughness:.55});
 const stripeMat=new THREE.MeshStandardMaterial({color:map==='Factory'?0xe3a54a:map==='Desert'?0x3a4542:0xc8fa69,emissive:map==='Harbor'?0x26330c:0x000000,emissiveIntensity:.25,roughness:.5});
 // The original bright block stacks are replaced by map-specific tactical dressing.
-addRuggedBattlefield(box,wallMat,trimMat,stripeMat,map);
-addBackroomsArea(box,wallMat,trimMat,stripeMat);
+// Always build a simple, visible combat arena first so the match remains playable
+// even if optional cinematic dressing fails on a mobile browser.
+for(let side of [-1,1]){
+ for(let i=0;i<5;i++){
+  const z=-20+i*10;
+  box(side*15,1.35,z,3.2,2.7,4.2,crateMat,side*.035);
+  box(side*25,1.0,z+4,4.4,2.0,3.0,wallMat,side*.06);
+ }
+}
+box(-2,1.15,-8,5.2,2.3,1.2,crateMat);
+box(5,1.15,1,4.4,2.3,1.2,wallMat);
+box(-8,1.05,9,4.2,2.1,1.4,crateMat);
+try{addRuggedBattlefield(box,wallMat,trimMat,stripeMat,map);}catch(err){console.error('Optional battlefield dressing failed; keeping basic arena',err);}
+try{addBackroomsArea(box,wallMat,trimMat,stripeMat);}catch(err){console.error('Backrooms dressing failed',err);}
+
 
 const gunMetal=new THREE.MeshStandardMaterial({color:0x242b2d,metalness:.78,roughness:.3});
 const weaponFinish=localStorage.getItem('shadowWeaponSkin')||'standard';const gunPolymer=new THREE.MeshStandardMaterial({color:weaponFinish==='cyan'?0x18cbd0:weaponFinish==='gold'?0xc99b36:0x151b1d,metalness:weaponFinish==='gold' ? 0.72 : 0.15,roughness:weaponFinish==='gold' ? 0.3 : 0.58});
