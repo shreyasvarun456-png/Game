@@ -67,6 +67,17 @@ const chestRig=new THREE.Mesh(new THREE.BoxGeometry(.40,.26,.055),dark);chestRig
 for(let i=0;i<3;i++){const mag=new THREE.Mesh(new THREE.BoxGeometry(.075,.16,.04),trimMatAvatar);mag.position.set((i-1)*.12,1.16,-.278);mag.castShadow=true;g.add(mag);}
 const neck=new THREE.Mesh(new THREE.CylinderGeometry(.105,.12,.13,12),dark);neck.position.set(0,1.43,0);g.add(neck);
 const chestPlate=new THREE.Mesh(new THREE.BoxGeometry(.39,.29,.07),armor);chestPlate.position.set(0,1.14,-.25);g.add(chestPlate);
+// Layered shoulder armor, radio cabling, stitching and reinforced boot soles.
+for(const side of [-1,1]){
+ const shoulder=new THREE.Mesh(new THREE.SphereGeometry(.17,14,10),armor);shoulder.scale.set(1.1,.72,1.05);shoulder.position.set(side*.39,1.31,-.015);shoulder.castShadow=true;g.add(shoulder);
+ const shoulderRim=new THREE.Mesh(new THREE.BoxGeometry(.20,.035,.20),trimMatAvatar);shoulderRim.position.set(side*.39,1.34,-.12);shoulderRim.rotation.z=side*.08;g.add(shoulderRim);
+ const bootSole=new THREE.Mesh(new THREE.BoxGeometry(.235,.035,.35),dark);bootSole.position.set(side*.17,.035,-.075);g.add(bootSole);
+ const thighPouch=new THREE.Mesh(new THREE.BoxGeometry(.12,.15,.10),pouchMat);thighPouch.position.set(side*.27,.54,-.12);g.add(thighPouch);
+}
+const helmetNVGArm=new THREE.Mesh(new THREE.BoxGeometry(.045,.055,.24),trimMatAvatar);helmetNVGArm.position.set(0,1.82,-.14);g.add(helmetNVGArm);
+const helmetNVG=new THREE.Mesh(new THREE.BoxGeometry(.17,.09,.10),dark);helmetNVG.position.set(0,1.79,-.25);g.add(helmetNVG);
+for(const side of [-1,1]){const lens=new THREE.Mesh(new THREE.CylinderGeometry(.027,.027,.018,12),glassMatAvatar);lens.rotation.x=Math.PI/2;lens.position.set(side*.045,1.79,-.307);g.add(lens);}
+
 for(let side of [-1,1]){
  const strapDetail=new THREE.Mesh(new THREE.BoxGeometry(.055,.48,.035),trimMatAvatar);strapDetail.position.set(side*.22,1.13,-.267);strapDetail.rotation.z=side*.09;g.add(strapDetail);
  const thigh=new THREE.Mesh(new THREE.BoxGeometry(.24,.18,.29),mat);thigh.position.set(side*.17,.49,-.015);g.add(thigh);
@@ -235,7 +246,7 @@ function buildArena(){
  scene.background=new THREE.Color(0x9ca9aa);
  scene.fog=new THREE.Fog(0x9ca9aa,110,220);
  const hemi=new THREE.HemisphereLight(0xdbe6e8,0x403a30,1.8);scene.add(hemi);
- const sun=new THREE.DirectionalLight(0xffe0b5,2.35);sun.position.set(-24,38,18);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-58;sun.shadow.camera.right=58;sun.shadow.camera.top=58;sun.shadow.camera.bottom=-58;sun.shadow.camera.near=.5;sun.shadow.camera.far=120;sun.shadow.bias=-.00025;scene.add(sun);
+ const sun=new THREE.DirectionalLight(0xffe0b5,2.35);sun.position.set(-24,38,18);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-58;sun.shadow.camera.right=58;sun.shadow.camera.top=58;sun.shadow.camera.bottom=-58;sun.shadow.camera.near=.5;sun.shadow.camera.far=120;sun.shadow.bias=-.00025;scene.add(sun);
  const dirtCanvas=document.createElement('canvas');dirtCanvas.width=dirtCanvas.height=512;const dctx=dirtCanvas.getContext('2d');
  const groundBase=map==='Desert'?'#88745d':map==='Factory'?'#555956':map==='Docks'?'#59635d':'#625a4c';dctx.fillStyle=groundBase;dctx.fillRect(0,0,512,512);
  for(let i=0;i<900;i++){const x=Math.random()*512,y=Math.random()*512,rx=3+Math.random()*28,ry=2+Math.random()*14;dctx.fillStyle=Math.random()>.5?'rgba(20,18,15,.10)':'rgba(190,168,132,.09)';dctx.beginPath();dctx.ellipse(x,y,rx,ry,Math.random()*3.14,0,Math.PI*2);dctx.fill();}
@@ -340,6 +351,16 @@ gunPart(new THREE.CylinderGeometry(.058,.058,.09,14),gunEdge,.32,-.26,-1.405,Mat
 gunPart(new THREE.BoxGeometry(.20,.035,.32),gunMetal,.32,-.188,-.90);
 for(let z=-1.04;z<-.72;z+=.065){gunPart(new THREE.BoxGeometry(.164,.018,.027),gunEdge,.32,-.263,z);gunPart(new THREE.BoxGeometry(.018,.09,.025),gunEdge,.235,-.27,z);gunPart(new THREE.BoxGeometry(.018,.09,.025),gunEdge,.405,-.27,z);}
 gunPart(new THREE.BoxGeometry(.075,.025,.60),gunEdge,.32,-.174,-.65);
+// Rail-mounted optic, iron sights, side light and textured vertical grip.
+gunPart(new THREE.BoxGeometry(.11,.055,.25),gunMetal,.32,-.125,-.56);
+gunPart(new THREE.BoxGeometry(.075,.08,.12),gunPolymer,.32,-.065,-.57);
+gunPart(new THREE.CylinderGeometry(.045,.045,.035,16),gunEdge,.32,-.065,-.60,Math.PI/2);
+gunPart(new THREE.CylinderGeometry(.030,.030,.012,16),glassMat,.32,-.065,-.622,Math.PI/2);
+gunPart(new THREE.BoxGeometry(.055,.10,.06),gunEdge,.32,-.105,-.99);
+gunPart(new THREE.BoxGeometry(.12,.10,.11),gunPolymer,.43,-.31,-.91);
+gunPart(new THREE.CylinderGeometry(.026,.026,.15,12),gunMetal,.43,-.31,-1.00,Math.PI/2);
+for(let z=-.92;z<-.72;z+=.05)gunPart(new THREE.BoxGeometry(.17,.012,.018),gunEdge,.32,-.34,z);
+
  // More convincing rifle furniture: adjustable stock, raised sights, ejection port,
  // charging handle, selector, front sight tower, and a perforated handguard.
  gunPart(new THREE.BoxGeometry(.13,.12,.28),gunPolymer,.32,-.275,-.035);
@@ -422,7 +443,7 @@ for(const [x,y,z] of [[.39,-.425,-.53],[.08,-.405,-.80]]){const hand=new THREE.M
 sniperMuzzlePoint=new THREE.Object3D();sniperMuzzlePoint.position.set(.32,-.25,-1.94);sniperToolMesh.add(sniperMuzzlePoint);
 sniperToolMesh.visible=false;
 camera.add(toolMesh);camera.add(sniperToolMesh);scene.add(camera);for(const p of state.room?.players||[])if(p.id!==state.selfId){const m=makeOperator(p.team,p.skin);addNameTag(m,p.name,p.team);m.position.set(p.x,0,p.z);m.userData.targetPosition=new THREE.Vector3(p.x,0,p.z);m.userData.targetYaw=p.yaw||0;scene.add(m);remoteMeshes.set(p.id,m);}mapBuilt=map;}
-function initRenderer(){const host=$('game-canvas');renderLoopId++;if(renderer){gameActive=false;renderer.dispose();host.innerHTML='';}scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(76,host.clientWidth/host.clientHeight||1,.1,250);camera.rotation.order='YXZ';renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75));renderer.setSize(host.clientWidth||900,host.clientHeight||600);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;host.appendChild(renderer.domElement);renderer.domElement.setAttribute('aria-label','SHADOW OPS game view');clock=new THREE.Clock();localPlayer();buildArena();localAvatar=makeOperator(myTeam(),state.skin);scene.add(localAvatar);localAvatar.visible=thirdPerson;if(state.selfId==='practice-local')spawnPracticeBots();$('camera-toggle').textContent=thirdPerson?'VIEW: 3P':'VIEW: 1P';$('match-map-wrap').classList.toggle('hidden',state.selfId!=='practice-local');$('match-map').value=state.room?.map||'Harbor';gameActive=true;tick(renderLoopId);}
+function initRenderer(){const host=$('game-canvas');renderLoopId++;if(renderer){gameActive=false;renderer.dispose();host.innerHTML='';}scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(76,host.clientWidth/host.clientHeight||1,.1,250);camera.rotation.order='YXZ';renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.6));renderer.setSize(host.clientWidth||900,host.clientHeight||600);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;host.appendChild(renderer.domElement);renderer.domElement.setAttribute('aria-label','SHADOW OPS game view');clock=new THREE.Clock();localPlayer();buildArena();localAvatar=makeOperator(myTeam(),state.skin);scene.add(localAvatar);localAvatar.visible=thirdPerson;if(state.selfId==='practice-local')spawnPracticeBots();$('camera-toggle').textContent=thirdPerson?'VIEW: 3P':'VIEW: 1P';$('match-map-wrap').classList.toggle('hidden',state.selfId!=='practice-local');$('match-map').value=state.room?.map||'Harbor';gameActive=true;tick(renderLoopId);}
 function localPlayer(){const p=state.room?.players.find(p=>p.id===state.selfId);if(p){local.x=p.x;local.y=p.y||1.7;local.z=p.z;local.yaw=p.yaw||0;local.pitch=p.pitch||0;}}
 function beginQuickPlay(){state.name=getName();if(!socket.connected){startPractice();return;}state.room=null;quickStartRequested=true;socket.emit('quickPlay',{name:state.name,map:$('create-map').value||'Harbor'});closeModal();clearTimeout(quickStartTimer);quickStartTimer=setTimeout(()=>{if(quickStartRequested&&!state.room)startPractice();},5500);}
 function leaveMatch(){gameActive=false;tagHeld=false;aiming=false;document.exitPointerLock?.();if(state.selfId==='practice-local'||!socket.connected){practiceBots.forEach(b=>{if(scene&&b.mesh)scene.remove(b.mesh);});practiceBots=[];state.room=null;state.selfId=null;updateUrl();showView('home');toast('You left the match.');return;}socket.emit('returnToLobby');$('game-message').classList.add('hidden');toast('Returning to squad lobby…');}
